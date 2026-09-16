@@ -29,7 +29,6 @@ const cache_manager_1 = require("@nestjs/cache-manager");
 const cache_manager_redis_yet_1 = require("cache-manager-redis-yet");
 const support_controller_1 = require("./support/support.controller");
 const public_controller_1 = require("./public/public.controller");
-const web_controller_1 = require("./web/web.controller");
 const prisma_service_1 = require("./prisma.service");
 let AppModule = class AppModule {
 };
@@ -91,7 +90,7 @@ exports.AppModule = AppModule = __decorate([
             store_module_1.StoreModule,
             notifications_module_1.NotificationsModule,
         ],
-        controllers: [app_controller_1.AppController, support_controller_1.SupportController, public_controller_1.PublicController, web_controller_1.WebController],
+        controllers: [app_controller_1.AppController, support_controller_1.SupportController, public_controller_1.PublicController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],
     })
 ], AppModule);

@@ -568,6 +568,9 @@ export default function AdminDashboard() {
     // Theme toggle
     const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('admin_theme') === 'dark' ? 'dark' : 'light'));
 
+    // Mobile sidebar state
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
     // Mascot mood manual override (stored in globalConfig via admin API)
     const [mascotOverrideEnabled, setMascotOverrideEnabled] = useState<boolean>(false);
     const [mascotMood, setMascotMood] = useState<string>('happy');
@@ -1353,7 +1356,8 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="card !p-0 overflow-hidden">
-                            <table className="w-full text-left border-collapse">
+                            <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[800px]">
                                 <thead className="bg-zinc-50 border-b border-zinc-100">
                                     <tr>
                                         <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">User / Tutor</th>
@@ -1421,6 +1425,7 @@ export default function AdminDashboard() {
                                         ))}
                                 </tbody>
                             </table>
+                        </div>
                         </div>
                     </div>
                 );
@@ -2101,8 +2106,8 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen flex bg-zinc-50 font-sans text-zinc-900">
-            {/* Sidebar */}
-            <aside className="w-64 bg-zinc-50 border-r border-zinc-200 px-4 py-6 flex flex-col shrink-0">
+            {/* Sidebar - hidden on small screens */}
+            <aside className="hidden md:flex w-64 bg-zinc-50 border-r border-zinc-200 px-4 py-6 flex flex-col shrink-0">
                 <div className="mb-10 px-2 flex items-center space-x-2">
                     <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center shadow-sm">
                         <ShieldCheck size={20} className="text-white" />
@@ -2179,9 +2184,64 @@ export default function AdminDashboard() {
                 </div>
             </aside>
 
+            {/* Mobile sidebar drawer */}
+            {mobileMenuOpen && (
+                <div className="fixed inset-0 z-40 flex md:hidden">
+                    <div className="fixed inset-0 bg-black/40" onClick={() => setMobileMenuOpen(false)} />
+                    <div className="relative w-72 bg-white border-r border-zinc-200 p-4 overflow-y-auto">
+                        <div className="mb-6 flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center shadow-sm">
+                                    <ShieldCheck size={18} className="text-white" />
+                                </div>
+                                <h1 className="text-base font-semibold">Setorial Admin</h1>
+                            </div>
+                            <button onClick={() => setMobileMenuOpen(false)} className="text-zinc-500">Close</button>
+                        </div>
+                        <nav className="space-y-1">
+                            {userRole !== 'TUTOR' && (
+                                <>
+                                    <SidebarItem icon={LayoutDashboard} label="Overview" active={activeTab === 'overview'} onClick={() => { setActiveTab('overview'); setMobileMenuOpen(false); }} />
+                                    <SidebarItem icon={ShieldCheck} label="KYC Review" active={activeTab === 'kyc'} onClick={() => { setActiveTab('kyc'); setMobileMenuOpen(false); }} badge={stats?.pendingKycCount} />
+                                    <SidebarItem icon={Users} label="Students" active={activeTab === 'users'} onClick={() => { setActiveTab('users'); setMobileMenuOpen(false); }} />
+                                </>
+                            )}
+                            <SidebarItem icon={BookOpen} label="Learning" active={activeTab === 'learning'} onClick={() => { setActiveTab('learning'); setMobileMenuOpen(false); }} />
+                            <SidebarItem icon={Ticket} label="Mock Exams" active={activeTab === 'mocks'} onClick={() => { setActiveTab('mocks'); setMobileMenuOpen(false); }} />
+                            {userRole !== 'TUTOR' && (
+                                <>
+                                    <SidebarItem icon={Percent} label="Discounts" active={activeTab === 'discounts'} onClick={() => { setActiveTab('discounts'); setMobileMenuOpen(false); }} />
+                                    <SidebarItem icon={Bell} label="Notifications" active={activeTab === 'notifications'} onClick={() => { setActiveTab('notifications'); setMobileMenuOpen(false); }} />
+                                    <SidebarItem icon={Globe} label="Geo-Pricing" active={activeTab === 'pricing'} onClick={() => { setActiveTab('pricing'); setMobileMenuOpen(false); }} />
+                                    <SidebarItem icon={Map} label="Region Pools" active={activeTab === 'regions'} onClick={() => { setActiveTab('regions'); setMobileMenuOpen(false); }} />
+                                    <SidebarItem icon={CreditCard} label="Payouts" active={activeTab === 'payouts'} onClick={() => { setActiveTab('payouts'); setMobileMenuOpen(false); }} />
+                                    <SidebarItem icon={RefreshCcw} label="Config" active={activeTab === 'configs'} onClick={() => { setActiveTab('configs'); setMobileMenuOpen(false); }} />
+                                    <SidebarItem icon={LifeBuoy} label="Support" active={activeTab === 'support'} onClick={() => { setActiveTab('support'); setMobileMenuOpen(false); }} badge={supportMessages.filter((m: any) => m.status === 'OPEN').length} />
+                                </>
+                            )}
+                        </nav>
+                    </div>
+                </div>
+            )}
+
             {/* Main Content */}
-            <main className="flex-1 bg-white p-8 overflow-y-auto">
+            <main className="flex-1 bg-white p-4 md:p-8 overflow-y-auto">
                 <div className="max-w-7xl mx-auto">
+                    {/* Mobile header */}
+                    <div className="md:hidden flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                            <button onClick={() => setMobileMenuOpen(true)} className="p-2 rounded-md bg-zinc-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+                            <h2 className="text-lg font-semibold">{(activeTab === 'overview' && 'Platform Overview') || activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <button onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); }} className="p-2 rounded-md bg-zinc-100">{theme === 'dark' ? '🌙' : '☀️'}</button>
+                        </div>
+                    </div>
+
                     {renderContent()}
                 </div>
             </main>

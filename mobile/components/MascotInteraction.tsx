@@ -74,6 +74,7 @@ export const MascotInteraction: React.FC<MascotInteractionProps> = ({
                     entering={noEntryAnimation ? undefined : FadeInRight.delay(400).springify().damping(22).stiffness(100).mass(0.8)}
                     style={styles.bubble}
                     className="bg-white dark:bg-[#1E222B] border-2 border-b-4 border-gray-100 dark:border-[#272B36]"
+                    pointerEvents="box-none"
                 >
                     {messageNode ? messageNode : (
                         <Text className="text-black dark:text-white font-bold text-[15px] leading-5">
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     lionContainer: {
         overflow: 'hidden',
         borderRadius: 20,
-        marginBottom: -8,
+        marginBottom: -4,
     },
     lionInner: {
         width: '100%',
@@ -113,11 +114,12 @@ const styles = StyleSheet.create({
     },
     bubble: {
         flex: 1,
-        padding: 16,
-        borderRadius: 20,
+        padding: 12,
+        borderRadius: 16,
         borderBottomLeftRadius: 0,
         marginLeft: 8,
-        marginBottom: 32,
+        marginBottom: 12,
+        zIndex: 0,
     },
     bubbleTail: {
         borderRightWidth: 10,

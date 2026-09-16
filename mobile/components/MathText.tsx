@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { KATEX_CSS, KATEX_JS, KATEX_AUTO_RENDER } from './katex-assets';
 
@@ -553,11 +553,18 @@ const DARK_COLORS = new Set(['#121212', '#0f172a', '#334155']);
 
 export function MathText({
   content = '',
-  color = '#121212',
+  color,
   fontSize = 16,
   containerStyle,
 }: MathTextProps) {
   const [height, setHeight] = React.useState(24);
+  const scheme = useColorScheme();
+
+  // Resolve color: prefer explicit prop, otherwise follow system theme
+  const resolvedColor = React.useMemo(() => {
+    if (color && /^#[0-9a-fA-F]{6}$/.test(color)) return color;
+    return scheme === 'dark' ? '#FFFFFF' : '#121212';
+  }, [color, scheme]);
 
   // Processing pipeline: escape HTML → sanitize math → wrap bare LaTeX
   const processedContent = React.useMemo(
@@ -570,11 +577,22 @@ export function MathText({
     [processedContent]
   );
 
-  const strongColor = DARK_COLORS.has(color) ? '#000000' : '#FFFFFF';
+  // Determine if resolved color is dark (compute luminance)
+  const isHexDark = (hex: string) => {
+    const c = hex.replace('#', '');
+    const r = parseInt(c.substr(0, 2), 16) / 255;
+    const g = parseInt(c.substr(2, 2), 16) / 255;
+    const b = parseInt(c.substr(4, 2), 16) / 255;
+    // relative luminance
+    const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return lum < 0.5;
+  };
+
+  const strongColor = isHexDark(resolvedColor) ? '#FFFFFF' : '#000000';
 
   const html = React.useMemo(
-    () => buildHtml({ encodedContent, color, fontSize, strongColor }),
-    [encodedContent, color, fontSize, strongColor]
+    () => buildHtml({ encodedContent, color: resolvedColor, fontSize, strongColor }),
+    [encodedContent, resolvedColor, fontSize, strongColor]
   );
 
   const handleMessage = React.useCallback(

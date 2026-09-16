@@ -11,7 +11,10 @@ export class GamificationService implements OnModuleDestroy, OnModuleInit {
         private prisma: PrismaService,
         private notificationsService: NotificationsService,
     ) {
-        this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+        const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+        this.redis = new Redis(redisUrl, {
+            tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+        });
     }
 
     async onModuleInit() {

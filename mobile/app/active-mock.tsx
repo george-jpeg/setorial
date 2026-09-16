@@ -122,7 +122,7 @@ export default function ActiveMockScreen() {
     if (!mock) {
         return (
             <SafeAreaView className="flex-1 bg-white dark:bg-[#0B0D12] items-center justify-center">
-                <Text className="text-gray-500 dark:text-gray-400 font-bold">Preparing Mock Exam...</Text>
+                <Text className="text-gray-500 dark:text-white font-bold">Preparing Mock Exam...</Text>
             </SafeAreaView>
         );
     }
@@ -135,7 +135,7 @@ export default function ActiveMockScreen() {
             {/* Header */}
             <View className="flex-row items-center justify-between px-5 py-4 border-b-2 border-[#E5E5E5] dark:border-[#272B36]">
                 <SoundButton onPress={confirmSubmit}>
-                    <ArrowLeft size={24} color="#000" className="dark:text-white" />
+                    <ArrowLeft size={24} color={isDark ? '#FFF' : '#000'} />
                 </SoundButton>
                 <Text className="text-black dark:text-white font-bold text-lg">{mock.title}</Text>
 
@@ -147,10 +147,10 @@ export default function ActiveMockScreen() {
                 </View>
             </View>
 
-            <ScrollView className="flex-1 px-5 pt-6 pb-20">
+            <ScrollView className="flex-1 px-5 pt-6 pb-20" showsVerticalScrollIndicator={false}>
                 {mock.questions.map((q: any, qIndex: number) => (
-                    <Animated.View key={q.id} entering={FadeIn.delay(qIndex * 80 + 100)} className="mb-10">
-                        <MathText content={`${qIndex + 1}. ${q.text}`} fontSize={20} containerStyle={{ marginBottom: 16 }} />
+                    <Animated.View key={q.id} entering={FadeIn.delay(qIndex * 80 + 100)} className="mb-6">
+                        <MathText content={`${qIndex + 1}. ${q.text}`} fontSize={20} containerStyle={{ marginBottom: 16 }} color={isDark ? '#FFFFFF' : '#171717'} />
 
                         {q.options.map((opt: string, optIndex: number) => {
                             const isSelected = answers[qIndex] === optIndex;
@@ -159,17 +159,17 @@ export default function ActiveMockScreen() {
                                     key={optIndex}
                                     activeOpacity={0.8}
                                     onPress={() => handleSelectOption(qIndex, optIndex)}
-                                    className={`p-4 rounded-xl border-2 border-b-4 mb-3 flex-row items-center
+                                    className={`p-4 rounded-xl border-2 border-b-4 mb-2 flex-row items-center
                                         ${isSelected
                                             ? 'bg-blue-50 dark:bg-[#1C2C47] border-[#1CB0F6] dark:border-[#1CB0F6]'
                                             : 'bg-white dark:bg-[#1E222B] border-[#E5E5E5] dark:border-[#272B36]'}`}
                                 >
                                     <View className={`w-6 h-6 rounded-full border-2 items-center justify-center mr-3
                                         ${isSelected ? 'border-[#1CB0F6] bg-[#1CB0F6]' : 'border-[#E5E5E5] dark:border-[#4B4B4B]'}`}>
-                                        {isSelected && <View className="w-2 h-2 rounded-full bg-white dark:bg-[#0B0D12]" />}
+                                        {isSelected && <View className="w-2 h-2 rounded-full bg-white" />}
                                     </View>
                                     <View style={{ flex: 1 }}>
-                                        <MathText content={opt} color={isSelected ? '#1CB0F6' : (isDark ? '#D1D5DB' : '#4B4B4B')} fontSize={16} />
+                                        <MathText content={opt} color={isSelected ? '#1CB0F6' : (isDark ? '#FFFFFF' : '#4B4B4B')} fontSize={16} />
                                     </View>
                                 </SoundButton>
                             );
@@ -184,7 +184,7 @@ export default function ActiveMockScreen() {
                         backgroundColor="#F59E0B"
                         shadowColor="#D97706"
                         contentClassName="py-4 flex-row items-center justify-center"
-                        className="rounded-2xl mb-10"
+                        className="rounded-2xl"
                     >
                         <CheckCircle2 size={24} color="#FFF" style={{ marginRight: 8 }} />
                         <Text className="text-white font-bold text-lg uppercase tracking-wider">
@@ -192,6 +192,8 @@ export default function ActiveMockScreen() {
                         </Text>
                     </TactileButton>
                 </Animated.View>
+                {/* Scroll spacer to match homepage spacing */}
+                <View style={{ height: 80 }} />
             </ScrollView>
         </SafeAreaView>
     );

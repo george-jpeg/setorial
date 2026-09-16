@@ -4,7 +4,9 @@ export declare class NotificationsService {
     private readonly logger;
     private readonly resend;
     private readonly globalFrom;
+    private readonly supportRedirect;
     constructor(prisma: PrismaService);
+    private renderTemplate;
     private executeEmailAsync;
     sendPush(userId: string, title: string, body: string, data?: Record<string, any>): Promise<void>;
     sendPushToMany(userIds: string[], title: string, body: string, data?: Record<string, any>): Promise<void>;

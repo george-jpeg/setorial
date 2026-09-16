@@ -3,7 +3,7 @@ import { MascotInteraction } from '../../components/MascotInteraction';
 import { Languages } from 'lucide-react-native';
 import { View, Text, ScrollView, TouchableOpacity, Image, RefreshControl, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowUpRight, ShieldCheck, CreditCard, ChevronRight, Trophy, Star, Clock, Sparkles } from 'lucide-react-native';
+import { ArrowUpRight, ShieldCheck, CreditCard, ChevronRight, Trophy, Star, Clock, Sparkles, Bot } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../store/authStore';
 import { useState, useEffect, useCallback } from 'react';
@@ -137,35 +137,21 @@ export default function HomeScreen() {
                     <MascotInteraction state="happy" message={mascotMessage} />
                 </View>
 
-                {/* Tier Dashboard Widget */}
-                <View className={`mb-8 border-2 border-b-8 p-6 rounded-[24px] overflow-hidden relative ${
-                    user?.tier === 'GOLD' ? 'bg-[#FEF9C3] dark:bg-[#422006] border-[#FDE047] dark:border-[#854D0E]' :
-                    user?.tier === 'SILVER' ? 'bg-[#F0F9FF] dark:bg-[#082F49] border-[#BAE6FD] dark:border-[#0369A1]' :
-                    user?.tier === 'BRONZE' ? 'bg-[#FFF7ED] dark:bg-[#431407] border-[#FED7AA] dark:border-[#9A3412]' :
-                    'bg-[#F5F3FF] dark:bg-[#2E1065] border-[#DDD6FE] dark:border-[#5B21B6]'
-                }`}>
+                {/* Tier Dashboard Widget - hidden for GOLD users */}
+                {user?.tier !== 'GOLD' && (
+                    <View className={`mb-8 border-2 border-b-8 p-6 rounded-[24px] overflow-hidden relative ${
+                        user?.tier === 'SILVER' ? 'bg-[#F0F9FF] dark:bg-[#082F49] border-[#BAE6FD] dark:border-[#0369A1]' :
+                        user?.tier === 'BRONZE' ? 'bg-[#FFF7ED] dark:bg-[#431407] border-[#FED7AA] dark:border-[#9A3412]' :
+                        'bg-[#F5F3FF] dark:bg-[#2E1065] border-[#DDD6FE] dark:border-[#5B21B6]'
+                    }`}> 
                     {/* Tier Icon / Background Element */}
                     <View className="absolute right-[-20] top-[-20] opacity-10">
-                        {user?.tier === 'GOLD' ? <Star size={180} color="#EAB308" /> :
-                         user?.tier === 'SILVER' ? <Trophy size={180} color="#0EA5E9" /> :
+                        {user?.tier === 'SILVER' ? <Trophy size={180} color="#0EA5E9" /> :
                          user?.tier === 'BRONZE' ? <ShieldCheck size={180} color="#CD7F32" /> :
                          <Sparkles size={180} color="#8B5CF6" />}
                     </View>
 
-                    {user?.tier === 'GOLD' ? (
-                        <View className="z-10">
-                            <View className="flex-row items-center mb-2">
-                                <View className="w-3 h-3 rounded-full bg-[#EAB308] mr-2" />
-                                <Text className="text-[#854D0E] dark:text-[#FDE047] font-black text-xs uppercase tracking-widest">{t('home.gold_status')}</Text>
-                            </View>
-                            <Text className="text-[#854D0E] dark:text-[#FDE047] font-black text-2xl mb-2">{t('home.gold_member')}</Text>
-                            <Text className="text-[#854D0E] dark:text-[#FEF9C3] font-bold text-[16px] mb-6 leading-5">{t('home.gold_desc')}</Text>
-                            <SoundButton onPress={() => router.push('/tutor')} className="bg-[#EAB308] flex-row justify-center items-center py-4 rounded-2xl border-b-4 border-[#CA8A04] shadow-lg shadow-yellow-500/40">
-                                <Sparkles size={20} color="#FFF" style={{ marginRight: 8 }} />
-                                <Text className="text-white font-bold text-[18px] tracking-wider uppercase">{t('home.open_tutor')}</Text>
-                            </SoundButton>
-                        </View>
-                    ) : user?.tier === 'SILVER' ? (
+                        {user?.tier === 'SILVER' ? (
                         <View className="z-10">
                             <View className="flex-row items-center mb-2">
                                 <View className="w-3 h-3 rounded-full bg-[#0EA5E9] mr-2" />
@@ -203,6 +189,7 @@ export default function HomeScreen() {
                         </View>
                     )}
                 </View>
+                )}
 
                 {/* Buying Power / Monetizable Balance */}
                 {['SILVER', 'GOLD'].includes(user?.tier || '') && (

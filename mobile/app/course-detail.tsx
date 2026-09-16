@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, Star, Lock, Check } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
+import { on } from '../lib/eventBus';
 import { learningApi } from "../services/api";
 import Animated, { FadeIn, FadeInDown, ZoomIn, withRepeat, withTiming, withSequence, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
@@ -126,6 +127,13 @@ export default function CourseDetailScreen() {
 
     useEffect(() => {
         if (id) fetchSubject();
+        // subscribe to lesson completion events and refresh subject automatically
+        const unsub = on('lessonCompleted', () => {
+            fetchSubject();
+        });
+        return () => {
+            unsub();
+        };
     }, [id]);
 
     const fetchSubject = async () => {

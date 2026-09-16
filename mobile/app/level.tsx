@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, useColorScheme, Linking, TextInput, StyleSheet, Image } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, useColorScheme, Linking, TextInput, StyleSheet, Image, Platform } from "react-native";
 import { WebView } from 'react-native-webview';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, CheckCircle2, XCircle, Trophy, ArrowRight, Home, BookOpen, Heart, RefreshCcw, Flame, Timer } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -11,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 
 import { learningApi } from "../services/api";
+import { emit } from '../lib/eventBus';
 import { MathText } from "../components/MathText";
 import { feedback } from "../lib/feedback";
 import { MascotInteraction } from '../components/MascotInteraction';
@@ -91,31 +93,27 @@ export default function LevelScreen() {
             checkSavedSession();
             fetchLesson();
         }
-    }, [id]);
-
-    const checkSavedSession = async () => {
-        try {
-            const data = await SecureStore.getItemAsync(`lesson_session_${id}`);
-            if (data) {
-                const session = JSON.parse(data);
-                setSavedSession(session);
-                setShowResumePrompt(true);
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    const fetchLesson = async () => {
-        try {
-            const res = await learningApi.getLesson(id as string);
-            setLesson(res.data);
-            if (!res.data.content) setPhase('questions');
-        } catch (error) {
-            console.error('Failed to fetch lesson:', error);
-        } finally {
-            setLoading(false);
-        }
+                                ) : (
+                                    videoStarted ? (
+                                        <YoutubePlayer
+                                            height={210}
+                                            play={true}
+                                            videoId={youTubeId as string}
+                                            onChangeState={(state) => {
+                                                // state can be 'playing', 'paused', 'ended', 'buffering', 'unstarted', 'cued', 'error'
+                                                if (state === 'error') {
+                                                    console.warn('YouTube iframe player error state', state);
+                                                    if (youTubeId) setVideoFailedId(youTubeId);
+                                                    setVideoStarted(false);
+                                                }
+                                            }}
+                                            onError={(e: any) => {
+                                                console.warn('YouTube iframe player error', e);
+                                                if (youTubeId) setVideoFailedId(youTubeId);
+                                                setVideoStarted(false);
+                                            }}
+                                        />
+                                    ) : (
     };
 
     const resumeSession = () => {
@@ -205,6 +203,8 @@ export default function LevelScreen() {
             });
             setResult(res.data);
             setPhase('finished');
+            // notify listeners (subject/course pages) that a lesson was completed
+            try { emit('lessonCompleted', { lessonId: lesson.id }); } catch (e) {}
             if (res.data.passed) {
                 feedback.victory();
                 try {
@@ -256,9 +256,21 @@ export default function LevelScreen() {
     });
 
     const [videoStarted, setVideoStarted] = useState(false);
+    const [videoFailedId, setVideoFailedId] = useState<string | null>(null);
 
     const handleRecordPlay = async () => {
         if (videoStarted) return;
+        // If we've previously seen a playback failure for this YouTube id,
+        // open externally instead of retrying the embedded player to avoid Error 153 loops.
+        if (youTubeId && videoFailedId === youTubeId) {
+            try {
+                await Linking.openURL(lesson.videoUrl);
+                return;
+            } catch (e) {
+                console.warn('Failed to open external YouTube URL', e);
+            }
+        }
+
         setVideoStarted(true);
         try {
             await learningApi.recordVideoPlay(id as string);
@@ -385,11 +397,24 @@ export default function LevelScreen() {
                                         <WebView
                                             style={{ width: '100%', height: 210, backgroundColor: '#000' }}
                                             originWhitelist={["*"]}
-                                            source={{ html: `<!doctype html><html><head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" /></head><body style="margin:0;background-color:#000"><iframe width="100%" height="100%" src="https://www.youtube.com/embed/${youTubeId}?rel=0&modestbranding=1&playsinline=1&autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></body></html>` }}
+                                            thirdPartyCookiesEnabled={true}
+                                            sharedCookiesEnabled={true}
+                                            source={{ html: `<!doctype html><html><head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" /></head><body style="margin:0;background-color:#000"><iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/${youTubeId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></body></html>` }}
                                             javaScriptEnabled={true}
                                             domStorageEnabled={true}
                                             allowsInlineMediaPlayback={true}
                                             mediaPlaybackRequiresUserAction={false}
+                                            allowsFullscreenVideo={true}
+                                            mixedContentMode="always"
+                                            startInLoadingState={true}
+                                            userAgent={Platform.OS === 'ios' ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15' : undefined}
+                                            onError={(e) => {
+                                                console.warn('YouTube WebView error', e.nativeEvent?.description || e);
+                                                // mark this video as failed so we don't retry the embedded player repeatedly
+                                                if (youTubeId) setVideoFailedId(youTubeId);
+                                                // fallback: stop embedded player and show the open-external UI
+                                                setVideoStarted(false);
+                                            }}
                                         />
                                     ) : (
                                         <TouchableOpacity activeOpacity={0.9} onPress={handleRecordPlay} style={{ width: '100%', height: 210, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>

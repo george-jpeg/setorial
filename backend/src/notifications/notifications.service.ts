@@ -2,15 +2,38 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { Resend } from 'resend';
 import axios from 'axios';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class NotificationsService {
     private readonly logger = new Logger(NotificationsService.name);
     private readonly resend: Resend;
     private readonly globalFrom = process.env.EMAIL_FROM_ADDRESS || 'Setorial <onboarding@resend.dev>';
+    private readonly supportRedirect = process.env.SUPPORT_REDIRECT_EMAIL || 'setorialltd@gmail.com';
     
     constructor(private prisma: PrismaService) {
         this.resend = new Resend(process.env.RESEND_API_KEY || 're_dummy');
+    }
+
+    // Simple template renderer for HTML templates in backend/email_templates
+    private async renderTemplate(filename: string, vars: Record<string, any> = {}): Promise<string> {
+      try {
+        const templatesDir = process.env.EMAIL_TEMPLATES_DIR || path.join(process.cwd(), 'backend', 'email_templates');
+        const fullPath = path.join(templatesDir, filename);
+        const raw = await fs.promises.readFile(fullPath, { encoding: 'utf8' });
+        let out = raw;
+        Object.keys(vars).forEach(k => {
+          const re = new RegExp(`{{\\s*${k}\\s*}}`, 'gi');
+          out = out.replace(re, String(vars[k] ?? ''));
+        });
+        // remove any unreplaced placeholders
+        out = out.replace(/{{[^}]+}}/g, '');
+        return out;
+      } catch (err: any) {
+        this.logger.error(`Failed to load email template ${filename}: ${err.message}`);
+        return '';
+      }
     }
 
     /**
@@ -19,8 +42,13 @@ export class NotificationsService {
     private async executeEmailAsync(jobData: any): Promise<void> {
         try {
             if (jobData.batch) {
-                await this.resend.batch.send(jobData.batch);
-                this.logger.log(`Batch email job completed for ${jobData.batch.length} recipients.`);
+              const { data, error } = await this.resend.batch.send(jobData.batch);
+              if (error) {
+                this.logger.error(`Batch email send error: ${error.message}`);
+                throw new Error(error.message);
+              }
+              this.logger.log(`Batch email job completed for ${jobData.batch.length} recipients.`);
+              this.logger.debug(JSON.stringify(data));
             } else {
                 const { error } = await this.resend.emails.send({
                     from: this.globalFrom,
@@ -140,13 +168,32 @@ export class NotificationsService {
      * Standardized HTML Wrapper for Setorial emails.
      */
     private generateSetorialHtml(title: string, messageHtml: string, previewText: string = '') {
-        return `<!DOCTYPE html>
+      const logoUrl = (process.env.AWS_URL || '').replace(/\/$/, '') + '/public/logo.png';
+
+      // Ensure content has sensible inline styles for email clients that strip head CSS.
+      let contentHtml = messageHtml || '';
+      const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(contentHtml.trim());
+      if (!looksLikeHtml) {
+        // plain text -> wrap in paragraph
+        contentHtml = `<p>${contentHtml.replace(/\n/g, '<br/>')}</p>`;
+      }
+
+      // Add inline styles to common tags for email client compatibility
+      contentHtml = contentHtml
+        .replace(/<p(\s*>|[^>]*>)/gi, (m) => m.replace(/<p/i, '<p style="margin:0 0 16px;line-height:1.7;color:#252525;font-size:15px;">'))
+        .replace(/<h1(\s*>|[^>]*>)/gi, (m) => m.replace(/<h1/i, '<h1 style="font-size:22px;margin:0 0 12px;color:#171717;">'))
+        .replace(/<h2(\s*>|[^>]*>)/gi, (m) => m.replace(/<h2/i, '<h2 style="font-size:18px;margin:0 0 10px;color:#171717;">'))
+        .replace(/<ul(\s*>|[^>]*>)/gi, (m) => m.replace(/<ul/i, '<ul style="margin:0 0 16px 20px;padding:0;">'))
+        .replace(/<ol(\s*>|[^>]*>)/gi, (m) => m.replace(/<ol/i, '<ol style="margin:0 0 16px 20px;padding:0;">'))
+        .replace(/<li(\s*>|[^>]*>)/gi, (m) => m.replace(/<li/i, '<li style="margin-bottom:8px;">'))
+        .replace(/<a(\s*>|[^>]*>)/gi, (m) => m.replace(/<a/i, '<a style="color:#ff7600;text-decoration:underline;">'));
+      return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>\${title}</title>
+  <title>${title}</title>
 
   <style>
     html, body { margin: 0 !important; padding: 0 !important; width: 100% !important; background: #f7f7f7; }
@@ -182,8 +229,8 @@ export class NotificationsService {
 
 <body>
   <!-- Hidden preview text -->
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
-    \${previewText}
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+    ${previewText}
   </div>
 
   <center class="page">
@@ -199,9 +246,9 @@ export class NotificationsService {
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   <tr>
                     <td align="left" valign="middle">
-                      <a href="https://scholarsedgetutorial.com/home"
-                         style="font-family:Arial,Helvetica,sans-serif;font-size:21px;font-weight:700;color:#ffffff;">
-                        Setorial
+                      <a href="https://scholarsedgetutorial.com/home" style="display:flex;align-items:center;gap:10px;">
+                        <img src="${logoUrl}" alt="Setorial" width="36" height="36" style="border-radius:6px;display:inline-block;vertical-align:middle;" />
+                        <span style="font-family:Arial,Helvetica,sans-serif;font-size:21px;font-weight:700;color:#ffffff;">Setorial</span>
                       </a>
                     </td>
 
@@ -226,8 +273,8 @@ export class NotificationsService {
             <!-- EMAIL CONTENT -->
             <tr>
               <td class="mobile-padding" style="padding:42px 42px 34px;">
-                <div class="content">
-                  \${messageHtml}
+                <div class="content" style="font-family: Arial, Helvetica, sans-serif; color: #252525; font-size:15px; line-height:1.7;">
+                  ${contentHtml}
                 </div>
               </td>
             </tr>
@@ -288,124 +335,167 @@ export class NotificationsService {
     async sendOtpEmail(email: string, otpCode: string, name: string = 'Student') {
         const title = 'Your Setorial verification code';
         const formattedCode = otpCode.length === 6 ? `${otpCode.slice(0, 3)} ${otpCode.slice(3)}` : otpCode;
-        
-        const content = `
-            <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO ${name.toUpperCase()}</p>
-            <h1>Your Verification Code</h1>
-            <p>Please use the verification code below to sign in or verify your action.</p>
-            <div style="background-color: #ebfef0; border-radius: 6px; padding: 16px; text-align: center; margin: 24px 0;">
-                <span style="font-size: 32px; font-weight: 600; color: #065f46; letter-spacing: 4px;">${formattedCode}</span>
-            </div>
-            <p>This code will expire in 15 minutes and can only be used once. Never share this code with anyone.</p>
-        `;
+      const content = `
+        <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO ${name.toUpperCase()}</p>
+        <h1 style="font-size:22px;margin:0 0 12px;color:#171717;">Your Verification Code</h1>
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333;">Please use the verification code below to sign in or verify your action.</p>
+        <div style="background-color: #ebfef0; border-radius: 6px; padding: 16px; text-align: center; margin: 24px 0;">
+          <span style="font-size: 32px; font-weight: 600; color: #065f46; letter-spacing: 4px;">${formattedCode}</span>
+        </div>
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333;">This code will expire in 15 minutes and can only be used once. Never share this code with anyone.</p>
+      `;
 
-        this.executeEmailAsync({
-            to: email,
-            subject: title,
-            html: this.generateSetorialHtml(title, content)
-        });
+      const html = await this.renderTemplate('setorial_friendly_template.html', {
+        content_html: content,
+        name,
+        action_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        aws_url: process.env.AWS_URL || '',
+        site_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        preheader: 'Your Setorial verification code',
+        year: new Date().getFullYear(),
+        unsubscribe_url: process.env.UNSUBSCRIBE_URL || '#',
+        subject: title
+      });
+
+      this.executeEmailAsync({ to: email, subject: title, html });
     }
 
     async sendPasswordResetEmail(email: string, otpCode: string, name: string = 'Student') {
         const title = 'Reset Your Password';
         const formattedCode = otpCode.length === 6 ? `${otpCode.slice(0, 3)} ${otpCode.slice(3)}` : otpCode;
-        
-        const content = `
-            <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO ${name.toUpperCase()}</p>
-            <h1>Reset Your Password</h1>
-            <p>Your Setorial password reset code is:</p>
-            <div style="background-color: #ebfef0; border-radius: 6px; padding: 16px; text-align: center; margin: 24px 0;">
-                <span style="font-size: 32px; font-weight: 600; color: #065f46; letter-spacing: 4px;">${formattedCode}</span>
-            </div>
-            <p>If you didn't request this, you can safely ignore this email.</p>
-            <p>This code will expire in 15 minutes and can only be used once.</p>
-        `;
+      const content = `
+        <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO ${name.toUpperCase()}</p>
+        <h1 style="font-size:22px;margin:0 0 12px;color:#171717;">Reset Your Password</h1>
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333;">Your Setorial password reset code is:</p>
+        <div style="background-color: #ebfef0; border-radius: 6px; padding: 16px; text-align: center; margin: 24px 0;">
+          <span style="font-size: 32px; font-weight: 600; color: #065f46; letter-spacing: 4px;">${formattedCode}</span>
+        </div>
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333;">If you didn't request this, you can safely ignore this email. This code will expire in 15 minutes and can only be used once.</p>
+      `;
 
-        this.executeEmailAsync({
-            to: email,
-            subject: title,
-            html: this.generateSetorialHtml(title, content)
-        });
+      const html = await this.renderTemplate('setorial_friendly_template.html', {
+        content_html: content,
+        name,
+        action_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        aws_url: process.env.AWS_URL || '',
+        site_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        preheader: 'Reset your Setorial password',
+        year: new Date().getFullYear(),
+        unsubscribe_url: process.env.UNSUBSCRIBE_URL || '#',
+        subject: title
+      });
+
+      this.executeEmailAsync({ to: email, subject: title, html });
     }
 
     async sendWelcomeEmail(email: string, name: string) {
         const title = 'Welcome to Setorial! 🎉';
-        const content = `
-            <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO ${name.toUpperCase()}</p>
-            <h1>Welcome to Setorial 👋</h1>
-            <p>We are thrilled to have you onboard! Setorial is designed to make your learning journey profitable and engaging.</p>
-            <h2>What's next?</h2>
-            <ul>
-                <li>Navigate to your Learning Path to start earning Points.</li>
-                <li>Subscribe to Silver or Gold to unlock Monetization.</li>
-                <li>Verify your KYC to accept payouts globally.</li>
-            </ul>
-            <p style="margin-bottom:0;">
-                Happy studying,<br>
-                <strong>The Setorial Team</strong>
-            </p>
-        `;
+      const content = `
+        <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO ${name.toUpperCase()}</p>
+        <h1 style="font-size:22px;margin:0 0 12px;color:#171717;">Welcome to Setorial 👋</h1>
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333;">We are thrilled to have you onboard! Setorial is designed to make your learning journey profitable and engaging.</p>
+        <h2 style="font-size:18px;margin:0 0 10px;color:#171717;">What's next?</h2>
+        <ul style="margin:0 0 18px 20px;padding:0;color:#333;font-size:15px;line-height:1.7;">
+          <li style="margin-bottom:8px;">Navigate to your <strong>Learning Path</strong> to start earning Points.</li>
+          <li style="margin-bottom:8px;">Subscribe to <strong>Silver or Gold</strong> to unlock Monetization.</li>
+          <li style="margin-bottom:8px;">Verify your <strong>KYC</strong> to accept payouts globally.</li>
+        </ul>
+        <p style="margin-bottom:0;">Happy studying,<br/><strong>The Setorial Team</strong></p>
+      `;
 
-        this.executeEmailAsync({
-            to: email,
-            subject: title,
-            html: this.generateSetorialHtml(title, content)
-        });
+      const html = await this.renderTemplate('setorial_friendly_template.html', {
+        content_html: content,
+        name,
+        action_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        aws_url: process.env.AWS_URL || '',
+        site_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        preheader: 'Welcome to Setorial — get started',
+        year: new Date().getFullYear(),
+        unsubscribe_url: process.env.UNSUBSCRIBE_URL || '#',
+        subject: title
+      });
+
+      this.executeEmailAsync({ to: email, subject: title, html });
     }
 
     async sendPayoutConfirmation(email: string, amount: number, month: string) {
         const title = 'Your Payout is on the way! 💸';
-        const content = `
-            <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO LEARNER</p>
-            <h1>Your Payout is on the way! 💸</h1>
-            <p>Awesome news!</p>
-            <p>Your learning rewards for <b>${month}</b> have been processed. We've initiated a transfer of <b>₦${amount.toLocaleString()}</b> to your configured bank account.</p>
-            <p>Keep studying and acing those mock exams to increase your rank next month!</p>
-        `;
+      const content = `
+        <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">HELLO LEARNER</p>
+        <h1 style="font-size:22px;margin:0 0 12px;color:#171717;">Your Payout is on the way! 💸</h1>
+        <p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#333;">Awesome news! Your learning rewards for <strong>${month}</strong> have been processed.</p>
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.7;color:#333;">We've initiated a transfer of <strong>₦${amount.toLocaleString()}</strong> to your configured bank account. Keep studying to increase your rank next month!</p>
+      `;
 
-        this.executeEmailAsync({
-            to: email,
-            subject: 'Setorial Reward Payout Processing',
-            html: this.generateSetorialHtml(title, content)
-        });
+      const html = await this.renderTemplate('setorial_friendly_template.html', {
+        content_html: content,
+        name: '',
+        action_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        aws_url: process.env.AWS_URL || '',
+        site_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        preheader: 'Your Setorial payout is being processed',
+        year: new Date().getFullYear(),
+        unsubscribe_url: process.env.UNSUBSCRIBE_URL || '#',
+        subject: title
+      });
+
+      this.executeEmailAsync({ to: email, subject: 'Setorial Reward Payout Processing', html });
     }
 
     async sendBroadcastEmail(emails: string[], subject: string, htmlMessage: string) {
         const title = subject;
-        const html = this.generateSetorialHtml(title, htmlMessage);
+      const content_html = htmlMessage;
+      const html = await this.renderTemplate('setorial_friendly_template.html', {
+        content_html,
+        name: '',
+        action_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        aws_url: process.env.AWS_URL || '',
+        site_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        preheader: subject,
+        year: new Date().getFullYear(),
+        unsubscribe_url: process.env.UNSUBSCRIBE_URL || '#',
+        subject: title
+      });
 
         const chunks = [];
         for (let i = 0; i < emails.length; i += 50) {
             chunks.push(emails.slice(i, i + 50));
         }
 
-        for (const chunk of chunks) {
-            const batchPayload = chunk.map(email => ({
-                from: process.env.EMAIL_FROM_ADDRESS || 'Setorial <onboarding@resend.dev>',
-                to: email,
-                subject,
-                html
-            }));
-            this.executeEmailAsync({ batch: batchPayload });
-        }
+      for (const chunk of chunks) {
+        const batchPayload = chunk.map(email => ({
+          from: this.globalFrom,
+          to: email,
+          subject,
+          html
+        }));
+        this.executeEmailAsync({ batch: batchPayload });
+      }
     }
 
     async sendSupportEmail(userEmail: string, message: string) {
         const title = 'New Support Request from App';
-        const content = `
-            <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">SUPPORT REQUEST</p>
-            <h1>New Support Request from App</h1>
-            <p><b>From:</b> ${userEmail}</p>
-            <div class="divider"></div>
-            <br/>
-            <p>${message.replace(/\n/g, '<br/>')}</p>
-        `;
+      const content = `
+        <p style="font-size:12px;color:#ff7600;font-weight:700;margin:0 0 10px;">SUPPORT REQUEST</p>
+        <h1 style="font-size:22px;margin:0 0 12px;color:#171717;">New Support Request from App</h1>
+        <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#333;"><strong>From:</strong> ${userEmail}</p>
+        <div style="margin:12px 0;padding:12px;background:#f7f7f7;border-radius:6px;color:#333;">${message.replace(/\n/g, '<br/>')}</div>
+      `;
 
-        this.executeEmailAsync({
-            to: 'setorialapp@gmail.com',
-            replyTo: userEmail,
-            subject: `Support Request [${userEmail}]`,
-            html: this.generateSetorialHtml(title, content)
-        });
+      const html = await this.renderTemplate('setorial_friendly_template.html', {
+        content_html: content,
+        name: 'Support',
+        action_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        aws_url: process.env.AWS_URL || '',
+        site_url: process.env.SITE_URL || 'https://scholarsedgetutorial.com',
+        preheader: 'New support request received',
+        year: new Date().getFullYear(),
+        unsubscribe_url: process.env.UNSUBSCRIBE_URL || '#',
+        subject: title
+      });
+
+      const target = this.supportRedirect;
+      this.logger.log(`Routing support email to ${target} (original sender: ${userEmail})`);
+      this.executeEmailAsync({ to: target, replyTo: userEmail, subject: `Support Request [${userEmail}]`, html });
     }
 }
