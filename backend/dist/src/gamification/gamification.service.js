@@ -24,7 +24,10 @@ let GamificationService = class GamificationService {
     constructor(prisma, notificationsService) {
         this.prisma = prisma;
         this.notificationsService = notificationsService;
-        this.redis = new ioredis_1.default(process.env.REDIS_URL || 'redis://localhost:6379');
+        const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+        this.redis = new ioredis_1.default(redisUrl, {
+            tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+        });
     }
     async onModuleInit() {
         await this.getStarterBadges();

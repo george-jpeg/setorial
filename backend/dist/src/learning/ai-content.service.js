@@ -238,8 +238,12 @@ Respond ONLY with a JSON object:
     }
     async executeGeneration(prompt, saveCallback) {
         try {
-            const response = await axios_1.default.post('https://api.deepseek.com/chat/completions', {
-                model: 'deepseek-chat',
+            const rawBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
+            const baseUrl = rawBaseUrl.replace(/\/+$/, '');
+            const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
+            const model = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+            const response = await axios_1.default.post(endpoint, {
+                model,
                 messages: [
                     { role: 'system', content: 'You are a professional academic JSON generator. You provide deep, accurate, and extensive educational content.' },
                     { role: 'user', content: prompt }
