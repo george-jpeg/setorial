@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 
 import { useAuthStore } from '../store/authStore';
 
-const API_URL = 'https://setorial-backend-677120499703.us-central1.run.app';
+const API_URL = 'https://setorial-production.up.railway.app';
 
 export const api = axios.create({
     baseURL: API_URL,

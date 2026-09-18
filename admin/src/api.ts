@@ -5,7 +5,7 @@ const baseUrl = rawBaseUrl
     ? rawBaseUrl.startsWith('http')
         ? rawBaseUrl
         : `https://${rawBaseUrl}`
-    : 'https://setorial-backend-677120499703.us-central1.run.app';
+    : 'https://setorial-production.up.railway.app';
 
 const api = axios.create({
     baseURL: baseUrl,
