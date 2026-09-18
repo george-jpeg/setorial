@@ -3,12 +3,6 @@
   "project": "Setorial",
   "services": [
     {
-      "name": "admin",
-      "path": "./admin",
-      "buildCommand": "npm install && npm run build",
-      "startCommand": "serve -s dist -l 8080"
-    },
-    {
       "name": "backend",
       "path": "./backend",
       "buildCommand": "npm install --legacy-peer-deps && npm run build"
