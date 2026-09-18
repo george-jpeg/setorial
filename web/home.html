@@ -114,17 +114,17 @@
         }
 
         .btn-yellow {
-            background-color: #FFFBEB;
-            color: #111827;
-            border: 2.5px solid #F59E0B;
+            background-color: #FFFFFF;
+            color: #1F2937;
+            border: 3px solid #FFD147;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(245,158,11,0.25);
+            box-shadow: 0 0 15px rgba(255, 209, 71, 0.5), 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .btn-yellow:hover {
-            background-color: #FEF3C7;
+            background-color: #FFFDF5;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(245,158,11,0.35);
+            box-shadow: 0 0 20px rgba(255, 209, 71, 0.8), 0 6px 10px rgba(0,0,0,0.1);
         }
 
         .tag {
@@ -563,7 +563,19 @@
             .hero-img { position: relative; transform: none !important; width: 100% !important; max-width: 400px; height: 280px; left: auto !important; right: auto !important; }
             .hero-img:hover { transform: scale(1.02) !important; }
             .mascot-container { flex-direction: column; text-align: center; gap: 40px; }
-            .test-grid { grid-template-columns: 1fr; }
+            .test-grid { 
+                display: flex; 
+                flex-wrap: nowrap; 
+                overflow-x: auto; 
+                scroll-snap-type: x mandatory; 
+                padding-bottom: 20px; 
+                -webkit-overflow-scrolling: touch; 
+            }
+            .test-card { 
+                flex: 0 0 85%; 
+                scroll-snap-align: center; 
+            }
+            .test-grid::-webkit-scrollbar { display: none; }
             .nav-links { display: none; /* Add a hamburger menu for full mobile implementation */ }
         }
         
@@ -599,13 +611,11 @@
                 Setorial
             </div>
             <nav class="nav-links">
+                <a href="/home#app">Download app</a>
                 <a href="/home#about">About</a>
-                <a href="/home#features">Features</a>
                 <a href="/home#testimonials">Testimonials</a>
-                <a href="/terms">Terms</a>
-                <a href="/privacy">Privacy</a>
             </nav>
-            <a href="/home#" class="btn btn-yellow">Get Started</a>
+            <a href="/home#" class="btn btn-yellow">Start learning</a>
         </div>
     </header>
 
@@ -673,32 +683,32 @@
         
         <div class="features-grid">
             <div class="feature-card animate slide-up delay-1">
-                <div class="feature-icon"><i class="fa-solid fa-laptop"></i></div>
+                <div class="feature-icon"><i class="fa-solid fa-comments"></i></div>
                 <h4>Live Interactive Classes</h4>
-                <p>We combine the best of modern technology to create immersive learning experiences for your children.</p>
+                <p>Join live lessons with Google Meet. Participate in real-time discussions and activities.</p>
             </div>
             <div class="feature-card animate slide-up delay-2">
-                <div class="feature-icon"><i class="fa-solid fa-bullseye"></i></div>
+                <div class="feature-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                 <h4>Personalized Learning</h4>
-                <p>Our modules are tailored to provide a personalized learning experience for every single student.</p>
+                <p>Our mascot is dedicated to providing personalized learning experiences for each student.</p>
             </div>
             <div class="feature-card animate slide-up delay-3">
                 <div class="feature-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
-                <h4>Designed For Young</h4>
-                <p>Our curriculum is tailored to the exact needs of young learners, ensuring they absorb the best education.</p>
+                <h4>Designed for Young Learners</h4>
+                <p>Our curriculum is tailored to the unique needs of young learners, ensuring they receive the best possible education.</p>
             </div>
             <div class="feature-card animate slide-up delay-4">
                 <div class="feature-icon"><i class="fa-solid fa-gamepad"></i></div>
                 <h4>Interactive Learning</h4>
-                <p>Our platforms are designed to be interactive so that your child won't be bored but rather remain engaged.</p>
+                <p>Our platform is designed to be interactive and engaging, ensuring that students are actively involved in their learning.</p>
             </div>
             <div class="feature-card animate slide-up delay-5">
-                <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
+                <div class="feature-icon"><i class="fa-regular fa-calendar-check"></i></div>
                 <h4>Flexible Schedule</h4>
-                <p>Schedules are flexible. They suit your exact lifestyle and fit perfectly into normal learning systems.</p>
+                <p>Schedule classes that fit your family's lifestyle with our convenient online booking system.</p>
             </div>
             <div class="feature-card animate slide-up delay-6">
-                <div class="feature-icon"><i class="fa-solid fa-chart-bar"></i></div>
+                <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
                 <h4>Progress Tracking</h4>
                 <p>Monitor your child's growth with real-time analytics and detailed performance reports delivered weekly.</p>
             </div>
@@ -708,12 +718,12 @@
     <section id="about" class="mascot-section">
         <div class="container mascot-container">
             <div class="mascot-text">
-                <h2 class="animate slide-right">Hello, My name is ELIA</h2>
+                <h2 class="animate slide-right">Hello, My name is Setor</h2>
                 <p class="animate slide-right delay-1">How is everything going, dear learners? I am your learning buddy on Setorial! My goal is to make learning fun and exciting. Download the App and let's start this adventure together!</p>
                 <a href="#" class="btn btn-yellow animate slide-right delay-2">Download app</a>
             </div>
             <div class="mascot-image-wrapper animate slide-left delay-3">
-                <img src="public/mascot.png" alt="Elia the mascot" class="mascot-img" />
+                <img src="public/mascot.png" alt="Setor the mascot" class="mascot-img" />
             </div>
         </div>
     </section>
@@ -761,7 +771,7 @@
 
     <section class="bottom-cta">
         <div class="container">
-            <div class="animate fade-scale" style="font-size: 48px; margin-bottom: 24px;">🌱</div>
+            <div class="animate fade-scale" style="font-size: 48px; margin-bottom: 24px; color: white;"><i class="fa-solid fa-scissors fa-flip-horizontal"></i></div>
             <h2 class="animate slide-up delay-1">Ready to Get Started?</h2>
             <p class="animate slide-up delay-2">Join thousands of students who are already succeeding<br>with this online learning program!</p>
             <div class="hero-actions animate slide-up delay-3" style="margin-bottom: 0;">
