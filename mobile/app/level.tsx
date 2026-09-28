@@ -403,7 +403,7 @@ export default function LevelScreen() {
                                             originWhitelist={["*"]}
                                             thirdPartyCookiesEnabled={true}
                                             sharedCookiesEnabled={true}
-                                            source={{ html: `<!doctype html><html><head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" /></head><body style="margin:0;background-color:#000"><iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/${youTubeId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></body></html>` }}
+                                            source={{ html: `<!doctype html><html><head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" /></head><body style="margin:0;background-color:#000"><iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/${youTubeId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></body></html>`, baseUrl: 'https://scholarsedgetutorial.com/' }}
                                             javaScriptEnabled={true}
                                             domStorageEnabled={true}
                                             allowsInlineMediaPlayback={true}

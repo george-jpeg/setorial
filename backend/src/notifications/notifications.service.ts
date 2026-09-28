@@ -19,7 +19,7 @@ export class NotificationsService {
     // Simple template renderer for HTML templates in backend/email_templates
     private async renderTemplate(filename: string, vars: Record<string, any> = {}): Promise<string> {
       try {
-        const templatesDir = process.env.EMAIL_TEMPLATES_DIR || path.join(process.cwd(), 'backend', 'email_templates');
+        const templatesDir = process.env.EMAIL_TEMPLATES_DIR || path.join(process.cwd(), 'email_templates');
         const fullPath = path.join(templatesDir, filename);
         const raw = await fs.promises.readFile(fullPath, { encoding: 'utf8' });
         let out = raw;

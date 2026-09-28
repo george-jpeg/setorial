@@ -227,10 +227,10 @@ export default function HomeScreen() {
                     >
                         <View className="w-2/3 pr-4 z-10">
                             <Text className="text-white font-black text-2xl tracking-tight leading-tight mb-2">
-                                BECOME ELIGIBLE{'\n'}FOR REWARDS
+                                {t('home.become_eligible')}
                             </Text>
                             <Text className="text-yellow-800 text-[15px] font-bold mb-4">
-                                Upgrade to Silver or Gold tier to monetize your points.
+                                {t('home.monetize_points')}
                             </Text>
                             <View className="bg-white dark:bg-zinc-950 px-5 py-3 rounded-xl self-start border-b-4 border-gray-200 dark:border-zinc-800">
                                 <Text className="text-[#FFC800] font-bold text-[15px] uppercase tracking-wider">{t('common.upgrade')}</Text>

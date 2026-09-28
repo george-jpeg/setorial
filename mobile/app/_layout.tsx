@@ -162,9 +162,9 @@ export default function RootLayout() {
 
                         <View className="w-full space-y-4">
                             {[
-                                { name: 'English', code: 'en' },
-                                { name: 'Français', code: 'fr' },
-                                { name: 'Español', code: 'es' }
+                                { name: 'English', code: 'en', flag: '🇺🇸' },
+                                { name: 'Français', code: 'fr', flag: '🇫🇷' },
+                                { name: 'Español', code: 'es', flag: '🇪🇸' }
                             ].map((lang) => {
                                 const active = i18n.language === lang.code;
                                 return (
@@ -174,9 +174,12 @@ export default function RootLayout() {
                                             useAuthStore.getState().setLanguage(lang.code);
                                             setLangModalOpen(false);
                                         }}
-                                        className={`flex-row items-center justify-between p-5 rounded-2xl border-2 ${active ? 'border-[#1CB0F6] bg-blue-50 dark:bg-blue-900/20' : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40'}`}
+                                        className={`flex-row items-center justify-between p-5 rounded-2xl border-2 mb-3 ${active ? 'border-[#1CB0F6] bg-blue-50 dark:bg-blue-900/20' : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40'}`}
                                     >
-                                        <Text className={`font-bold text-lg ${active ? 'text-[#1CB0F6]' : 'text-black dark:text-white'}`}>{lang.name}</Text>
+                                        <View className="flex-row items-center">
+                                            <Text className="text-2xl mr-4">{lang.flag}</Text>
+                                            <Text className={`font-bold text-lg ${active ? 'text-[#1CB0F6]' : 'text-black dark:text-white'}`}>{lang.name}</Text>
+                                        </View>
                                         {active && <Check size={20} color="#1CB0F6" />}
                                     </TouchableOpacity>
                                 );
