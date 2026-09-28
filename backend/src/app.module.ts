@@ -23,6 +23,7 @@ import { redisStore } from 'cache-manager-redis-yet';
 import { SupportController } from './support/support.controller';
 import { PublicController } from './public/public.controller';
 import { PrismaService } from './prisma.service';
+import { BackupModule } from './backup/backup.module';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { PrismaService } from './prisma.service';
     MockExamsModule,
     StoreModule,
     NotificationsModule,
+    BackupModule,
   ],
   controllers: [AppController, SupportController, PublicController],
   providers: [AppService, PrismaService],

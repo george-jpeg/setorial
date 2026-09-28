@@ -93,27 +93,31 @@ export default function LevelScreen() {
             checkSavedSession();
             fetchLesson();
         }
-                                ) : (
-                                    videoStarted ? (
-                                        <YoutubePlayer
-                                            height={210}
-                                            play={true}
-                                            videoId={youTubeId as string}
-                                            onChangeState={(state) => {
-                                                // state can be 'playing', 'paused', 'ended', 'buffering', 'unstarted', 'cued', 'error'
-                                                if (state === 'error') {
-                                                    console.warn('YouTube iframe player error state', state);
-                                                    if (youTubeId) setVideoFailedId(youTubeId);
-                                                    setVideoStarted(false);
-                                                }
-                                            }}
-                                            onError={(e: any) => {
-                                                console.warn('YouTube iframe player error', e);
-                                                if (youTubeId) setVideoFailedId(youTubeId);
-                                                setVideoStarted(false);
-                                            }}
-                                        />
-                                    ) : (
+    }, [id]);
+
+    const checkSavedSession = async () => {
+        try {
+            const data = await SecureStore.getItemAsync(`lesson_session_${id}`);
+            if (data) {
+                const session = JSON.parse(data);
+                setSavedSession(session);
+                setShowResumePrompt(true);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const fetchLesson = async () => {
+        try {
+            const res = await learningApi.getLesson(id as string);
+            setLesson(res.data);
+            if (!res.data.content) setPhase('questions');
+        } catch (error) {
+            console.error('Failed to fetch lesson:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const resumeSession = () => {
@@ -437,7 +441,7 @@ export default function LevelScreen() {
                                         player={player}
                                         style={{ width: '100%', height: 210 }}
                                         contentFit="contain"
-                                        allowsFullscreen
+                                        fullscreenOptions={{ enable: true }}
                                     />
                                 ) : (
                                     <TouchableOpacity activeOpacity={0.9} onPress={handleRecordPlay} style={{ width: '100%', height: 210, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
@@ -504,12 +508,12 @@ export default function LevelScreen() {
             <View style={{ flex: 1, backgroundColor: isDark ? '#0B0D12' : '#FFFFFF' }}>
                 <LinearGradient
                     colors={backgroundGradient}
-                    style={StyleSheet.absoluteFillObject}
+                    style={StyleSheet.absoluteFill}
                 />
 
                 {/* Confetti Layer */}
                 {result?.passed && (
-                    <View pointerEvents="none" style={{ ...StyleSheet.absoluteFillObject, zIndex: 10 }}>
+                    <View pointerEvents="none" style={{ ...StyleSheet.absoluteFill, zIndex: 10 }}>
                         <LottieView
                             ref={lottieRef}
                             source={{ uri: 'https://assets9.lottiefiles.com/packages/lf20_u4yrau.json' }}

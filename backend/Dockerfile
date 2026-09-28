@@ -25,8 +25,8 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Install runtime dependencies (OpenSSL is required by Prisma)
-RUN apk add --no-cache openssl
+# Install runtime dependencies (OpenSSL is required by Prisma, postgresql-client and gzip for DB backups)
+RUN apk add --no-cache openssl postgresql-client gzip
 
 # Copy necessary files from builder
 COPY --from=builder /app/package*.json ./
