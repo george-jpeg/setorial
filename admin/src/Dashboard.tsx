@@ -769,14 +769,23 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleEditLesson = (lesson: any) => {
-        setEditingLesson(lesson);
+    const handleEditLesson = async (lesson: any) => {
+        // The subject tree doesn't include questions, so fetch the full lesson first.
+        let full = lesson;
+        try {
+            const res = await adminApi.getLesson(lesson.id);
+            if (res?.data) full = { ...lesson, ...res.data };
+        } catch (err) {
+            alert('Failed to load lesson questions. Please try again.');
+            return;
+        }
+        setEditingLesson(full);
         setLessonForm({
-            name: lesson.name,
-            content: lesson.content || '',
-            videoUrl: lesson.videoUrl || '',
-            rewardPoints: lesson.rewardPoints ?? 10,
-            questions: lesson.questions || []
+            name: full.name,
+            content: full.content || '',
+            videoUrl: full.videoUrl || '',
+            rewardPoints: full.rewardPoints ?? 10,
+            questions: full.questions || []
         });
         setIsLessonModalOpen(true);
     };
