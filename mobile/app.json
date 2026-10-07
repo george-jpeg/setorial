@@ -15,8 +15,14 @@
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/adaptive-icon.png"
       },
-      "package": "com.yeezykng_dom.setorial",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.scholarsedge.setorial",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,13 +47,15 @@
       "expo-router",
       "expo-web-browser",
       "expo-status-bar",
-      "expo-audio"
+      "expo-audio",
+      "@react-native-google-signin/google-signin"
     ],
-    "owner": "george.allday",
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "aab3f036-1301-4810-8c63-9affa55408b5"
+        "projectId": "8b76e847-0383-48d3-a297-e2e9088bb0f6"
       }
-    }
+    },
+    "owner": "scholars-edge"
   }
 }

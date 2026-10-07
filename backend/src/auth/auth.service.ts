@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { PrismaService } from '../prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import axios from 'axios';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -178,6 +180,76 @@ export class AuthService {
         });
 
         return { message: 'Password has been successfully reset. You can now log in.' };
+    }
+
+    async googleLogin(idToken: string, ipCountry?: string) {
+        if (!idToken) throw new BadRequestException('Missing Google ID token');
+
+        const audiences = (process.env.GOOGLE_CLIENT_IDS || '')
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+        if (audiences.length === 0) {
+            this.logger.error('GOOGLE_CLIENT_IDS is not configured');
+            throw new BadRequestException('Google sign-in is not configured');
+        }
+
+        let payload: any;
+        try {
+            const res = await axios.get('https://oauth2.googleapis.com/tokeninfo', { params: { id_token: idToken }, timeout: 10000 });
+            payload = res.data;
+        } catch (err: any) {
+            this.logger.warn(`Invalid Google token: ${err.response?.data?.error_description || err.message}`);
+            throw new UnauthorizedException('Invalid Google token');
+        }
+
+        const validIssuer = payload?.iss === 'accounts.google.com' || payload?.iss === 'https://accounts.google.com';
+        if (!validIssuer || !audiences.includes(payload?.aud)) {
+            this.logger.warn(`Google token audience/issuer mismatch: aud=${payload?.aud} iss=${payload?.iss}`);
+            throw new UnauthorizedException('Invalid Google token');
+        }
+
+        const emailVerified = payload?.email_verified === true || payload?.email_verified === 'true';
+        if (!payload?.email || !emailVerified) {
+            throw new UnauthorizedException('Google account email is not verified');
+        }
+
+        const email = payload.email.toLowerCase();
+        let user = await this.prisma.user.findFirst({ where: { email: { equals: email, mode: 'insensitive' } } });
+        let isNew = false;
+
+        if (!user) {
+            // Google users get an unusable random password; they can set one via "Forgot Password".
+            const randomPassword = await bcrypt.hash(randomBytes(32).toString('hex'), 10);
+            user = await this.usersService.createUser({
+                email,
+                password: randomPassword,
+                name: payload.name || email.split('@')[0],
+                avatarUrl: payload.picture || null,
+                isEmailVerified: true,
+            });
+            isNew = true;
+        } else if (!user.isEmailVerified) {
+            // Google has verified ownership of this email, so we can mark it verified.
+            user = await this.prisma.user.update({
+                where: { id: user.id },
+                data: { isEmailVerified: true, emailOtp: null, emailOtpExpiresAt: null },
+            });
+        }
+
+        if (ipCountry && user.countryLocked && user.billingCountry && user.billingCountry.toUpperCase() !== ipCountry.toUpperCase() && !user.isFlagged) {
+            user = await this.prisma.user.update({ where: { id: user.id }, data: { isFlagged: true } });
+        }
+
+        await this.prisma.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } });
+
+        if (isNew) {
+            this.notificationsService.sendWelcomeEmail(user.email, user.name || 'Student').catch(err =>
+                this.logger.warn(`Failed to queue welcome email in googleLogin: ${err.message}`)
+            );
+        }
+
+        return this.generateAuthResponse(user);
     }
 
     private generateAuthResponse(user: any) {

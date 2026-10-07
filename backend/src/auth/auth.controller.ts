@@ -34,6 +34,13 @@ export class AuthController {
         return this.authService.login(loginDto, ipCountry);
     }
 
+    @HttpCode(HttpStatus.OK)
+    @Post('google')
+    async googleLogin(@Body() body: { idToken: string }, @Request() req: any) {
+        const ipCountry = req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || null;
+        return this.authService.googleLogin(body.idToken, ipCountry);
+    }
+
     @UseGuards(JwtAuthGuard)
     @Patch('password')
     async changePassword(

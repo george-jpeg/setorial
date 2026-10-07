@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+play-service-account.json
+
+setorial-*-firebase-adminsdk-*.json
+setorial-play-store-*.json
