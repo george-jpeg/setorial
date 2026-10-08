@@ -9,7 +9,7 @@ import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated'
 import { useTranslation } from 'react-i18next';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 
-const ICON_SIZE = 20;
+const ICON_SIZE = 22;
 
 const TAB_CONFIG = [
   { name: 'index', labelKey: 'tabs.home', fallback: 'Home', Icon: Home, color: '#F59E0B' },
@@ -29,7 +29,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const accentColor = isDark ? theme.border : theme.primary;
 
   return (
-    <View style={[styles.barOuter, { bottom: Math.max(14, insets.bottom) }]}>
+    <View style={[styles.barOuter, { bottom: Math.max(16, insets.bottom) }]}>
       <View style={[
         styles.barContainer,
         {
@@ -126,12 +126,12 @@ const styles = StyleSheet.create({
   barContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 7,
-    paddingVertical: 7,
-    borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderRadius: 24,
     borderWidth: 1.5,
-    gap: 6,
-    maxWidth: Dimensions.get('window').width - 48,
+    gap: 8,
+    maxWidth: Dimensions.get('window').width - 32,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.15,
@@ -142,23 +142,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    borderRadius: 16,
-    padding: 3,
+    borderRadius: 18,
+    padding: 4,
   },
   tabButtonActive: {
-    paddingHorizontal: 8,
-    paddingRight: 14,
-    gap: 7,
+    paddingHorizontal: 10,
+    paddingRight: 16,
+    gap: 8,
   },
   iconCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 14,
+    width: 50,
+    height: 50,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   label: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.2,
   },
