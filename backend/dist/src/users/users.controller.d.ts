@@ -25,11 +25,9 @@ export declare class UsersController {
         activeSub: any;
         detectedCountry: any;
         id?: string | undefined;
-        name?: string | null | undefined;
-        createdAt?: Date | undefined;
-        updatedAt?: Date | undefined;
         email?: string | undefined;
         password?: string | undefined;
+        name?: string | null | undefined;
         isEmailVerified?: boolean | undefined;
         emailOtp?: string | null | undefined;
         emailOtpExpiresAt?: Date | null | undefined;
@@ -48,6 +46,8 @@ export declare class UsersController {
         totalActiveDays?: number | undefined;
         assessmentPassed?: boolean | undefined;
         monetizationEligibleAt?: Date | null | undefined;
+        createdAt?: Date | undefined;
+        updatedAt?: Date | undefined;
         isFrozen?: boolean | undefined;
         isFlagged?: boolean | undefined;
         expoPushToken?: string | null | undefined;
@@ -58,11 +58,9 @@ export declare class UsersController {
         expoPushToken?: string;
     }, file?: Express.Multer.File): Promise<{
         id: string;
-        name: string | null;
-        createdAt: Date;
-        updatedAt: Date;
         email: string;
         password: string;
+        name: string | null;
         isEmailVerified: boolean;
         emailOtp: string | null;
         emailOtpExpiresAt: Date | null;
@@ -81,6 +79,8 @@ export declare class UsersController {
         totalActiveDays: number;
         assessmentPassed: boolean;
         monetizationEligibleAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
         isFrozen: boolean;
         isFlagged: boolean;
         expoPushToken: string | null;
@@ -166,11 +166,9 @@ export declare class UsersController {
     resolveAccount(accountNumber: string, bankCode: string): Promise<any>;
     getUser(id: string): Promise<{
         id: string;
-        name: string | null;
-        createdAt: Date;
-        updatedAt: Date;
         email: string;
         password: string;
+        name: string | null;
         isEmailVerified: boolean;
         emailOtp: string | null;
         emailOtpExpiresAt: Date | null;
@@ -189,6 +187,8 @@ export declare class UsersController {
         totalActiveDays: number;
         assessmentPassed: boolean;
         monetizationEligibleAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
         isFrozen: boolean;
         isFlagged: boolean;
         expoPushToken: string | null;

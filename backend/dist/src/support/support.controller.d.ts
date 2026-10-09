@@ -6,10 +6,10 @@ export declare class SupportController {
         subject: string;
         message: string;
     }): Promise<{
+        subject: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        subject: string;
         userId: string;
         status: import("@prisma/client").$Enums.SupportStatus;
         message: string;
@@ -18,10 +18,10 @@ export declare class SupportController {
         repliedBy: string | null;
     }>;
     getMyMessages(req: any): Promise<{
+        subject: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        subject: string;
         userId: string;
         status: import("@prisma/client").$Enums.SupportStatus;
         message: string;

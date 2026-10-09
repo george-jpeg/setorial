@@ -9,9 +9,9 @@ export declare class LearningController {
         topic: {
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             description: string | null;
             order: number;
             subjectId: string;
@@ -31,9 +31,9 @@ export declare class LearningController {
         } & {
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             order: number;
             content: string | null;
             videoUrl: string | null;
@@ -52,6 +52,7 @@ export declare class LearningController {
         title: string;
         numQuestions?: number;
         durationMinutes?: number;
+        price?: number;
     }, req: any): Promise<{
         questions: {
             id: string;
@@ -66,9 +67,9 @@ export declare class LearningController {
         }[];
     } & {
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -90,9 +91,9 @@ export declare class LearningController {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;
@@ -102,23 +103,23 @@ export declare class LearningController {
     createSubject(dto: CreateSubjectDto, req: any): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
     deleteSubject(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
     createTopic(dto: CreateTopicDto, req: any): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -126,9 +127,9 @@ export declare class LearningController {
     updateTopic(id: string, dto: any): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -136,9 +137,9 @@ export declare class LearningController {
     deleteTopic(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -153,18 +154,18 @@ export declare class LearningController {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     })[]>;
     getSubjects(req: any): Promise<({
         topics: ({
             lessons: {
                 id: string;
                 name: string;
-                isApproved: boolean;
                 createdAt: Date;
                 updatedAt: Date;
+                isApproved: boolean;
                 order: number;
                 content: string | null;
                 videoUrl: string | null;
@@ -174,9 +175,9 @@ export declare class LearningController {
         } & {
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             description: string | null;
             order: number;
             subjectId: string;
@@ -184,9 +185,9 @@ export declare class LearningController {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     })[]>;
     getSubject(id: string, req: any): Promise<{
         topics: {
@@ -198,9 +199,9 @@ export declare class LearningController {
                 };
                 id: string;
                 name: string;
-                isApproved: boolean;
                 createdAt: Date;
                 updatedAt: Date;
+                isApproved: boolean;
                 order: number;
                 content: string | null;
                 videoUrl: string | null;
@@ -209,18 +210,18 @@ export declare class LearningController {
             }[];
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             description: string | null;
             order: number;
             subjectId: string;
         }[];
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
     getLesson(id: string, req: any): Promise<any>;
     createLesson(dto: CreateLessonDto, req: any): Promise<{
@@ -238,9 +239,9 @@ export declare class LearningController {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;
@@ -270,9 +271,9 @@ export declare class LearningController {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;
@@ -282,16 +283,16 @@ export declare class LearningController {
     approveSubject(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
     approveTopic(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -299,9 +300,9 @@ export declare class LearningController {
     approveLesson(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;

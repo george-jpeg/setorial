@@ -43,17 +43,17 @@ export declare class AdminController {
     }>;
     getPendingKyc(): Promise<{
         id: string;
-        name: string | null;
-        createdAt: Date;
         email: string;
+        name: string | null;
         tier: import("@prisma/client").$Enums.Tier;
         payoutMethod: import("@prisma/client").$Enums.PayoutMethod | null;
         payoutAccount: import("@prisma/client/runtime/client").JsonValue;
+        createdAt: Date;
     }[]>;
     approveKyc(userId: string): Promise<{
         id: string;
-        name: string | null;
         email: string;
+        name: string | null;
         isVerified: boolean;
         kycStatus: import("@prisma/client").$Enums.KycStatus;
     }>;
@@ -64,22 +64,22 @@ export declare class AdminController {
     }>;
     getAllUsers(tier?: string, kycStatus?: string, role?: string): Promise<{
         id: string;
-        name: string | null;
-        createdAt: Date;
         email: string;
+        name: string | null;
         role: import("@prisma/client").$Enums.Role;
         tier: import("@prisma/client").$Enums.Tier;
         isVerified: boolean;
         kycStatus: import("@prisma/client").$Enums.KycStatus;
+        createdAt: Date;
         isFrozen: boolean;
         isFlagged: boolean;
     }[]>;
     createTutor(data: any): Promise<{
         id: string;
-        name: string | null;
-        createdAt: Date;
         email: string;
+        name: string | null;
         role: import("@prisma/client").$Enums.Role;
+        createdAt: Date;
     }>;
     freezeUser(userId: string, isFrozen: boolean): Promise<{
         id: string;
@@ -218,9 +218,9 @@ export declare class AdminController {
         }[];
     } & {
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -241,9 +241,9 @@ export declare class AdminController {
         }[];
     } & {
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -264,9 +264,9 @@ export declare class AdminController {
         }[];
     } & {
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -275,9 +275,9 @@ export declare class AdminController {
     }) | null>;
     deleteMock(id: string): Promise<{
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -298,9 +298,9 @@ export declare class AdminController {
         }[];
     } & {
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -309,9 +309,9 @@ export declare class AdminController {
     }>;
     approveMock(id: string): Promise<{
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -320,14 +320,14 @@ export declare class AdminController {
     }>;
     getSupportMessages(): Promise<({
         user: {
-            name: string | null;
             email: string;
+            name: string | null;
         };
     } & {
+        subject: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        subject: string;
         userId: string;
         status: import("@prisma/client").$Enums.SupportStatus;
         message: string;
@@ -339,10 +339,10 @@ export declare class AdminController {
         reply: string;
         adminName: string;
     }): Promise<{
+        subject: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        subject: string;
         userId: string;
         status: import("@prisma/client").$Enums.SupportStatus;
         message: string;
@@ -495,10 +495,10 @@ export declare class AdminController {
         }[];
         user: {
             id: string;
-            name: string | null;
-            createdAt: Date;
             email: string;
+            name: string | null;
             lastActiveAt: Date | null;
+            createdAt: Date;
         };
     }>;
     getCohortOverview(): Promise<{

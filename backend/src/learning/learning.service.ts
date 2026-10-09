@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateSubjectDto, CreateTopicDto, CreateLessonDto, SubmitLessonDto } from './dto/learning.dto';
 import { GamificationService } from '../gamification/gamification.service';
@@ -222,7 +222,24 @@ export class LearningService {
         return { ...subject, topics: annotatedTopics };
     }
 
-    async getLesson(id: string, role?: string) {
+    async getLesson(id: string, role?: string, userId?: string) {
+        if (userId && (!role || role === 'STUDENT')) {
+            const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { tier: true, role: true } });
+            if (user && user.role === 'STUDENT' && (!user.tier || user.tier === 'FREE')) {
+                const startOfToday = new Date();
+                startOfToday.setHours(0, 0, 0, 0);
+                const completedToday = await this.prisma.userProgress.count({
+                    where: {
+                        userId,
+                        completedAt: { gte: startOfToday }
+                    }
+                });
+                if (completedToday >= 5) {
+                    throw new BadRequestException('Free tier is limited to 5 lessons per day. Upgrade to continue learning!');
+                }
+            }
+        }
+
         const lesson = await this.prisma.lesson.findUnique({
             where: { id },
             include: { 
@@ -297,6 +314,24 @@ export class LearningService {
         });
 
         if (!lesson) throw new NotFoundException('Lesson not found');
+
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { tier: true, role: true }
+        });
+        if (user && user.role === 'STUDENT' && (!user.tier || user.tier === 'FREE')) {
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+            const completedToday = await this.prisma.userProgress.count({
+                where: {
+                    userId,
+                    completedAt: { gte: startOfToday }
+                }
+            });
+            if (completedToday >= 5) {
+                throw new BadRequestException('Free tier is limited to 5 completed lessons per day. Upgrade to continue learning!');
+            }
+        }
 
         let score = 0;
         const breakdown: any[] = [];

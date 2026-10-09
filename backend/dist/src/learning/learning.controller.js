@@ -39,7 +39,7 @@ let LearningController = class LearningController {
         if (req.user.role === client_1.Role.STUDENT && req.user.tier === 'FREE') {
             throw new common_1.BadRequestException('Custom AI Mocks are only available for paying users.');
         }
-        return this.aiContentService.generateMockExam(dto.subjectId, dto.title, dto.numQuestions, dto.durationMinutes, req.user.role);
+        return this.aiContentService.generateMockExam(dto.subjectId, dto.title, dto.numQuestions, dto.durationMinutes, req.user.role, dto.price);
     }
     async regenerateLesson(id, req) {
         return this.aiContentService.regenerateLesson(id, req.user.role);
@@ -69,7 +69,7 @@ let LearningController = class LearningController {
         return this.learningService.getSubjectPathway(id, req.user.userId, req.user.role);
     }
     async getLesson(id, req) {
-        return this.learningService.getLesson(id, req.user.role);
+        return this.learningService.getLesson(id, req.user?.role, req.user?.userId);
     }
     async createLesson(dto, req) {
         return this.learningService.createLesson(dto, req.user);

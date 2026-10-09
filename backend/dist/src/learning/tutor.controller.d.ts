@@ -13,8 +13,8 @@ export declare class TutorController {
     }[]>;
     getMessages(sessionId: string, req: any): Promise<{
         id: string;
-        createdAt: Date;
         role: string;
+        createdAt: Date;
         content: string;
         sessionId: string;
     }[]>;

@@ -32,6 +32,13 @@ export declare class AuthController {
         token: string;
         refresh_token: string;
     }>;
+    googleLogin(body: {
+        idToken: string;
+    }, req: any): Promise<{
+        user: any;
+        token: string;
+        refresh_token: string;
+    }>;
     changePassword(req: any, body: {
         currentPassword: string;
         newPassword: string;

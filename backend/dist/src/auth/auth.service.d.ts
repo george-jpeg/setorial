@@ -33,5 +33,10 @@ export declare class AuthService {
     resetPassword(email: string, otp: string, newPassword: string): Promise<{
         message: string;
     }>;
+    googleLogin(idToken: string, ipCountry?: string): Promise<{
+        user: any;
+        token: string;
+        refresh_token: string;
+    }>;
     private generateAuthResponse;
 }

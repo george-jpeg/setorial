@@ -220,7 +220,23 @@ let LearningService = class LearningService {
         });
         return { ...subject, topics: annotatedTopics };
     }
-    async getLesson(id, role) {
+    async getLesson(id, role, userId) {
+        if (userId && (!role || role === 'STUDENT')) {
+            const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { tier: true, role: true } });
+            if (user && user.role === 'STUDENT' && (!user.tier || user.tier === 'FREE')) {
+                const startOfToday = new Date();
+                startOfToday.setHours(0, 0, 0, 0);
+                const completedToday = await this.prisma.userProgress.count({
+                    where: {
+                        userId,
+                        completedAt: { gte: startOfToday }
+                    }
+                });
+                if (completedToday >= 5) {
+                    throw new common_1.BadRequestException('Free tier is limited to 5 lessons per day. Upgrade to continue learning!');
+                }
+            }
+        }
         const lesson = await this.prisma.lesson.findUnique({
             where: { id },
             include: {
@@ -286,6 +302,23 @@ let LearningService = class LearningService {
         });
         if (!lesson)
             throw new common_1.NotFoundException('Lesson not found');
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { tier: true, role: true }
+        });
+        if (user && user.role === 'STUDENT' && (!user.tier || user.tier === 'FREE')) {
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+            const completedToday = await this.prisma.userProgress.count({
+                where: {
+                    userId,
+                    completedAt: { gte: startOfToday }
+                }
+            });
+            if (completedToday >= 5) {
+                throw new common_1.BadRequestException('Free tier is limited to 5 completed lessons per day. Upgrade to continue learning!');
+            }
+        }
         let score = 0;
         const breakdown = [];
         lesson.questions.forEach((q, index) => {

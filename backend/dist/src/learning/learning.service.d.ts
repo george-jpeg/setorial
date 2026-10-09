@@ -12,23 +12,23 @@ export declare class LearningService {
     createSubject(dto: CreateSubjectDto, user?: any): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
     deleteSubject(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
     createTopic(dto: CreateTopicDto, user?: any): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -36,9 +36,9 @@ export declare class LearningService {
     updateTopic(id: string, data: any, user?: any): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -46,9 +46,9 @@ export declare class LearningService {
     deleteTopic(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -68,9 +68,9 @@ export declare class LearningService {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;
@@ -92,9 +92,9 @@ export declare class LearningService {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;
@@ -106,9 +106,9 @@ export declare class LearningService {
             lessons: {
                 id: string;
                 name: string;
-                isApproved: boolean;
                 createdAt: Date;
                 updatedAt: Date;
+                isApproved: boolean;
                 order: number;
                 content: string | null;
                 videoUrl: string | null;
@@ -118,9 +118,9 @@ export declare class LearningService {
         } & {
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             description: string | null;
             order: number;
             subjectId: string;
@@ -128,9 +128,9 @@ export declare class LearningService {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     })[]>;
     getSubjectPathway(id: string, userId: string, role?: string): Promise<{
         topics: {
@@ -142,9 +142,9 @@ export declare class LearningService {
                 };
                 id: string;
                 name: string;
-                isApproved: boolean;
                 createdAt: Date;
                 updatedAt: Date;
+                isApproved: boolean;
                 order: number;
                 content: string | null;
                 videoUrl: string | null;
@@ -153,20 +153,20 @@ export declare class LearningService {
             }[];
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             description: string | null;
             order: number;
             subjectId: string;
         }[];
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
-    getLesson(id: string, role?: string): Promise<any>;
+    getLesson(id: string, role?: string, userId?: string): Promise<any>;
     updateLessonWithVideo(id: string, dto: any, user?: any, video?: Express.Multer.File): Promise<{
         questions: {
             id: string;
@@ -182,9 +182,9 @@ export declare class LearningService {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;
@@ -209,23 +209,23 @@ export declare class LearningService {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     })[]>;
     approveSubject(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
     }>;
     approveTopic(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         order: number;
         subjectId: string;
@@ -233,9 +233,9 @@ export declare class LearningService {
     approveLesson(id: string): Promise<{
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;

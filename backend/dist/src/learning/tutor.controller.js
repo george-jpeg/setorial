@@ -100,12 +100,8 @@ IMPORTANT MATH FORMATTING:
             res.write(`event: session\ndata: {"sessionId": "${sessionId}"}\n\n`);
         }
         try {
-            const rawBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
-            const baseUrl = rawBaseUrl.replace(/\/+$/, '');
-            const endpoint = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
-            const model = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
-            const response = await axios_1.default.post(endpoint, {
-                model,
+            const response = await axios_1.default.post('https://api.deepseek.com/chat/completions', {
+                model: 'deepseek-chat',
                 messages: messages,
                 stream: true,
                 max_tokens: 4096

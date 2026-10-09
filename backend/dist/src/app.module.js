@@ -30,6 +30,7 @@ const cache_manager_redis_yet_1 = require("cache-manager-redis-yet");
 const support_controller_1 = require("./support/support.controller");
 const public_controller_1 = require("./public/public.controller");
 const prisma_service_1 = require("./prisma.service");
+const backup_module_1 = require("./backup/backup.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -89,6 +90,7 @@ exports.AppModule = AppModule = __decorate([
             mock_exams_module_1.MockExamsModule,
             store_module_1.StoreModule,
             notifications_module_1.NotificationsModule,
+            backup_module_1.BackupModule,
         ],
         controllers: [app_controller_1.AppController, support_controller_1.SupportController, public_controller_1.PublicController],
         providers: [app_service_1.AppService, prisma_service_1.PrismaService],

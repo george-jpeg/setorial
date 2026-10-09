@@ -64,9 +64,9 @@ export declare class MockExamsController {
         }[];
     } & {
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;

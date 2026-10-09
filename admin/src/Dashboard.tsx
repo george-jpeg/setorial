@@ -142,7 +142,7 @@ export default function AdminDashboard() {
 
     // Mock AI Modal State
     const [isMockAiModalOpen, setIsMockAiModalOpen] = useState(false);
-    const [mockAiForm, setMockAiForm] = useState({ subjectId: '', title: '', numQuestions: '60', durationMinutes: '120' });
+    const [mockAiForm, setMockAiForm] = useState({ subjectId: '', title: '', numQuestions: '60', durationMinutes: '120', price: '100' });
 
     // Filters
     const [tierFilter, setTierFilter] = useState('');
@@ -340,8 +340,13 @@ export default function AdminDashboard() {
     };
 
     const handleShowAnalytics = async (id: string) => {
-        setAnalyticsModalUser({});
         setAnalyticsLoading(true);
+        const existing = users.find((u: any) => u.id === id);
+        setAnalyticsModalUser({
+            user: existing || { name: 'Student', email: '' },
+            tier: existing?.tier,
+            points: existing?.points
+        });
         try {
             const [statsRes, analyticsRes] = await Promise.all([
                 adminApi.getUserStats(id),
@@ -350,12 +355,12 @@ export default function AdminDashboard() {
             setAnalyticsModalUser({
                 ...analyticsRes.data,
                 ...statsRes.data,
-                user: analyticsRes.data.user,
+                user: analyticsRes.data.user || existing || { name: 'Student', email: '' },
             });
         } catch (err: any) {
             console.error('Failed to load analytics', err);
-            setAnalyticsModalUser(null);
             alert(err.response?.data?.message || 'Failed to load analytics');
+            setAnalyticsModalUser(null);
         } finally {
             setAnalyticsLoading(false);
         }
@@ -510,7 +515,8 @@ export default function AdminDashboard() {
                 subjectId: mockAiForm.subjectId, 
                 title: mockAiForm.title, 
                 numQuestions: Number(mockAiForm.numQuestions),
-                durationMinutes: Number(mockAiForm.durationMinutes)
+                durationMinutes: Number(mockAiForm.durationMinutes),
+                price: Number(mockAiForm.price || 100),
             });
             alert('AI Mock Exam generated successfully!');
             setIsMockAiModalOpen(false);
@@ -1982,23 +1988,26 @@ export default function AdminDashboard() {
                             <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-zinc-950/20 backdrop-blur-sm">
                                 <div className="bg-white rounded-2xl shadow-xl ring-1 ring-zinc-950/5 w-full max-w-2xl overflow-hidden">
                                     <div className="px-8 py-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
-                                        <h3 className="text-lg font-semibold text-zinc-900">Analytics • {analyticsModalUser.user.name || analyticsModalUser.user.email}</h3>
+                                        <h3 className="text-lg font-semibold text-zinc-900">Analytics • {analyticsModalUser?.user?.name || analyticsModalUser?.user?.email || 'Student'}</h3>
                                         <button onClick={() => setAnalyticsModalUser(null)} className="text-zinc-400 hover:text-zinc-600">Close</button>
                                     </div>
-                                    <div className="p-8 space-y-4">
-                                        {analyticsLoading ? (
-                                            <div>Loading...</div>
-                                        ) : (
-                                            <div className="space-y-6">
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="card p-4">
-                                                        <div className="text-sm text-zinc-500">Plan Tier</div>
-                                                        <div className="font-bold text-zinc-900">{analyticsModalUser.tier || analyticsModalUser.planTier || (analyticsModalUser.user?.tier)}</div>
-                                                    </div>
-                                                    <div className="card p-4">
-                                                        <div className="text-sm text-zinc-500">Date Joined</div>
-                                                        <div className="font-bold text-zinc-900">{new Date(analyticsModalUser.dateJoined || analyticsModalUser.user.createdAt).toLocaleString()}</div>
-                                                    </div>
+                                    <div className="p-8 space-y-4 max-h-[75vh] overflow-y-auto">
+                                        {analyticsLoading && (
+                                            <div className="p-4 bg-amber-50 rounded-xl text-amber-800 text-xs font-semibold flex items-center space-x-2">
+                                                <div className="w-3 h-3 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                                                <span>Fetching live statistics & server analytics...</span>
+                                            </div>
+                                        )}
+                                        <div className="space-y-6">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="card p-4">
+                                                    <div className="text-sm text-zinc-500">Plan Tier</div>
+                                                    <div className="font-bold text-zinc-900">{analyticsModalUser?.tier || analyticsModalUser?.planTier || (analyticsModalUser?.user?.tier) || 'FREE'}</div>
+                                                </div>
+                                                <div className="card p-4">
+                                                    <div className="text-sm text-zinc-500">Date Joined</div>
+                                                    <div className="font-bold text-zinc-900">{analyticsModalUser?.dateJoined || analyticsModalUser?.user?.createdAt ? new Date(analyticsModalUser.dateJoined || analyticsModalUser.user.createdAt).toLocaleString() : '—'}</div>
+                                                </div>
 
                                                     <div className="card p-4">
                                                         <div className="text-sm text-zinc-500">Current Streak</div>
@@ -2087,7 +2096,6 @@ export default function AdminDashboard() {
                                                     </div>
                                                 </div>
                                             </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -2572,6 +2580,19 @@ export default function AdminDashboard() {
                                 />
                             </div>
 
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Price (₦ NGN - 0 for Free)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="10"
+                                    className="input-field"
+                                    value={mockAiForm.price}
+                                    onChange={(e) => setMockAiForm({ ...mockAiForm, price: e.target.value })}
+                                    required
+                                />
+                            </div>
+
                             <div className="pt-4 flex justify-end space-x-3">
                                 <button type="button" onClick={() => setIsMockAiModalOpen(false)} className="btn-secondary h-10 px-6 text-sm">Cancel</button>
                                 <button type="submit" className="btn-primary bg-purple-600 hover:bg-purple-700 h-10 px-8 text-sm" disabled={loading}>
@@ -2673,14 +2694,18 @@ export default function AdminDashboard() {
                         <form onSubmit={handleSaveMock} className="flex-1 overflow-hidden flex flex-col">
                             <div className="flex-1 overflow-y-auto p-10 space-y-10">
                                 {/* Basic Info */}
-                                <div className="grid grid-cols-2 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Exam Title</label>
                                         <input type="text" className="input-field" value={mockForm.title} onChange={(e) => setMockForm({ ...mockForm, title: e.target.value })} required />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Duration (Minutes)</label>
-                                        <input type="number" className="input-field" value={mockForm.durationMinutes} onChange={(e) => setMockForm({ ...mockForm, durationMinutes: Number(e.target.value) })} required />
+                                        <input type="number" min="1" className="input-field" value={mockForm.durationMinutes} onChange={(e) => setMockForm({ ...mockForm, durationMinutes: Number(e.target.value) })} required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] ml-1">Price (₦ NGN - 0 for Free)</label>
+                                        <input type="number" min="0" step="10" className="input-field" value={mockForm.price} onChange={(e) => setMockForm({ ...mockForm, price: Number(e.target.value) })} required />
                                     </div>
                                 </div>
 

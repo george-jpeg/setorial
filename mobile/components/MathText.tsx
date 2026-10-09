@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, useColorScheme } from 'react-native';
+import { View, Text, useColorScheme } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { KATEX_CSS, KATEX_JS, KATEX_AUTO_RENDER } from './katex-assets';
 
@@ -565,6 +565,23 @@ export function MathText({
     if (color && /^#[0-9a-fA-F]{6}$/.test(color)) return color;
     return scheme === 'dark' ? '#FFFFFF' : '#121212';
   }, [color, scheme]);
+
+  // Fast-path: If content has no LaTeX math commands or delimiters, render native Text instantly!
+  // This avoids spinning up 200+ heavy Chromium WebViews in mock exams and quizzes.
+  const hasMath = React.useMemo(() => {
+    if (!content || typeof content !== 'string') return false;
+    return /\$|\\(frac|sqrt|text|sum|prod|int|lim|log|ln|sin|cos|tan|times|div|pm|leq|geq|neq|approx|infty|alpha|beta|gamma|theta|pi|partial|nabla|left|right|begin|end)|\^\{|\_\{|\b\d+\/\d+\b/i.test(content);
+  }, [content]);
+
+  if (!hasMath) {
+    return (
+      <View style={[{ width: '100%', justifyContent: 'center' }, containerStyle]}>
+        <Text style={{ color: resolvedColor, fontSize, lineHeight: Math.round(fontSize * 1.45), fontWeight: '500' }}>
+          {content}
+        </Text>
+      </View>
+    );
+  }
 
   // Processing pipeline: escape HTML → sanitize math → wrap bare LaTeX
   const processedContent = React.useMemo(

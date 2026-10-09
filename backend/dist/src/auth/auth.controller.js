@@ -38,6 +38,10 @@ let AuthController = class AuthController {
         const ipCountry = req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || null;
         return this.authService.login(loginDto, ipCountry);
     }
+    async googleLogin(body, req) {
+        const ipCountry = req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || null;
+        return this.authService.googleLogin(body.idToken, ipCountry);
+    }
     async changePassword(req, body) {
         return this.authService.changePassword(req.user.userId, body.currentPassword, body.newPassword);
     }
@@ -80,6 +84,15 @@ __decorate([
     __metadata("design:paramtypes", [auth_dto_1.LoginDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, common_1.Post)('google'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleLogin", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Patch)('password'),

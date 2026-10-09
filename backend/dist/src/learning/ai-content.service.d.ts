@@ -13,9 +13,9 @@ export declare class AiContentService {
         topic: {
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             description: string | null;
             order: number;
             subjectId: string;
@@ -35,9 +35,9 @@ export declare class AiContentService {
         } & {
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
             order: number;
             content: string | null;
             videoUrl: string | null;
@@ -61,16 +61,16 @@ export declare class AiContentService {
     } & {
         id: string;
         name: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         order: number;
         content: string | null;
         videoUrl: string | null;
         rewardPoints: number;
         topicId: string;
     }>;
-    generateMockExam(subjectId: string, title: string, numQuestions?: number, durationMinutes?: number, userRole?: string): Promise<{
+    generateMockExam(subjectId: string, title: string, numQuestions?: number, durationMinutes?: number, userRole?: string, price?: number): Promise<{
         questions: {
             id: string;
             createdAt: Date;
@@ -84,9 +84,9 @@ export declare class AiContentService {
         }[];
     } & {
         id: string;
-        isApproved: boolean;
         createdAt: Date;
         updatedAt: Date;
+        isApproved: boolean;
         description: string | null;
         isActive: boolean;
         title: string;
@@ -97,17 +97,17 @@ export declare class AiContentService {
         subject: {
             id: string;
             name: string;
-            isApproved: boolean;
             createdAt: Date;
             updatedAt: Date;
+            isApproved: boolean;
         };
         topics: {
             topic: {
                 id: string;
                 name: string;
-                isApproved: boolean;
                 createdAt: Date;
                 updatedAt: Date;
+                isApproved: boolean;
                 description: string | null;
                 order: number;
                 subjectId: string;
@@ -127,9 +127,9 @@ export declare class AiContentService {
             } & {
                 id: string;
                 name: string;
-                isApproved: boolean;
                 createdAt: Date;
                 updatedAt: Date;
+                isApproved: boolean;
                 order: number;
                 content: string | null;
                 videoUrl: string | null;

@@ -65,7 +65,7 @@ let NotificationsService = NotificationsService_1 = class NotificationsService {
     }
     async renderTemplate(filename, vars = {}) {
         try {
-            const templatesDir = process.env.EMAIL_TEMPLATES_DIR || path.join(process.cwd(), 'backend', 'email_templates');
+            const templatesDir = process.env.EMAIL_TEMPLATES_DIR || path.join(process.cwd(), 'email_templates');
             const fullPath = path.join(templatesDir, filename);
             const raw = await fs.promises.readFile(fullPath, { encoding: 'utf8' });
             let out = raw;

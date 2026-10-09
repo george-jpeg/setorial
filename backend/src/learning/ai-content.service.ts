@@ -142,12 +142,13 @@ Respond ONLY with valid JSON:
         });
     }
 
-    async generateMockExam(subjectId: string, title: string, numQuestions: number = 30, durationMinutes?: number, userRole?: string) {
+    async generateMockExam(subjectId: string, title: string, numQuestions: number = 30, durationMinutes?: number, userRole?: string, price?: number) {
         const subject = await this.prisma.subject.findUnique({ where: { id: subjectId } });
         if (!subject) throw new Error('Subject not found');
 
         const isApproved = userRole === 'TUTOR' ? false : true;
         const duration = durationMinutes || Math.ceil(numQuestions * 1.5);
+        const mockPrice = price !== undefined && !isNaN(Number(price)) ? Number(price) : 100;
         const maxPerBatch = 30;
         
         let allQuestions: any[] = [];
@@ -200,6 +201,7 @@ Respond ONLY with valid JSON:
                 title: title,
                 description: `Comprehensive mock exam for ${subject.name}`,
                 durationMinutes: duration,
+                price: mockPrice,
                 isApproved,
                 questions: {
                     create: allQuestions.map((q: any) => ({

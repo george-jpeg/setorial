@@ -1,6 +1,6 @@
 import { SoundButton } from '../../components/SoundButton';
 import { Tabs } from 'expo-router';
-import { Home, Search, Wallet, MoreHorizontal, ShoppingBag } from 'lucide-react-native';
+import { Home, Search, Wallet, MoreHorizontal, ShoppingBag, Bot } from 'lucide-react-native';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/authStore';
@@ -14,12 +14,13 @@ const ICON_SIZE = 22;
 const TAB_CONFIG = [
   { name: 'index', labelKey: 'tabs.home', fallback: 'Home', Icon: Home, color: '#F59E0B' },
   { name: 'courses', labelKey: 'tabs.discover', fallback: 'Discover', Icon: Search, color: '#1CB0F6' },
+  { name: 'tutor', labelKey: 'tabs.tutor', fallback: 'AI Tutor', Icon: Bot, color: '#EAB308' },
   { name: 'statistics', labelKey: 'tabs.wallet', fallback: 'Wallet', Icon: Wallet, color: '#FFC800' },
   { name: 'store', labelKey: 'tabs.store', fallback: 'Store', Icon: ShoppingBag, color: '#CE82FF' },
   { name: 'profile', labelKey: 'tabs.more', fallback: 'More', Icon: MoreHorizontal, color: '#FF4B4B' },
 ];
 
-function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+function CustomTabBar({ state, descriptors, navigation }: any) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -37,11 +38,17 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
           borderColor: isDark ? '#272B36' : '#D8DAE0',
         }
       ]}>
-        {state.routes.map((route, index) => {
+        {state.routes.map((route: any, index: number) => {
           // Explicitly block the statistics tab for non-premium users from rendering
           if (route.name === 'statistics') {
             const showWallet = ['SILVER', 'GOLD'].includes(user?.tier || '');
             if (!showWallet) return null;
+          }
+
+          // Explicitly block the tutor tab for non-gold users from rendering
+          if (route.name === 'tutor') {
+            const isGold = user?.tier === 'GOLD';
+            if (!isGold) return null;
           }
 
           const focused = state.index === index;
@@ -101,6 +108,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 export default function TabLayout() {
   const { user } = useAuthStore();
   const showWallet = ['SILVER', 'GOLD'].includes(user?.tier || '');
+  const showTutor = user?.tier === 'GOLD';
 
   return (
     <Tabs
@@ -109,6 +117,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="index" />
       <Tabs.Screen name="courses" />
+      <Tabs.Screen name="tutor" options={{ href: showTutor ? undefined : null }} />
       <Tabs.Screen name="statistics" options={{ href: showWallet ? undefined : null }} />
       <Tabs.Screen name="store" />
       <Tabs.Screen name="profile" />

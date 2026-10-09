@@ -30,7 +30,12 @@ let GamificationService = class GamificationService {
         });
     }
     async onModuleInit() {
-        await this.getStarterBadges();
+        try {
+            await this.getStarterBadges();
+        }
+        catch (err) {
+            console.warn('[GamificationService] Could not seed starter badges (DB may not be ready):', err?.message);
+        }
     }
     onModuleDestroy() {
         this.redis.disconnect();

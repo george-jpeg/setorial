@@ -207,21 +207,39 @@ export class MockExamsService {
         const finalQuestions = allQuestions.sort(() => 0.5 - Math.random());
         const exactQuestions = finalQuestions.slice(0, validNumQuestions);
 
+        if (exactQuestions.length === 0) {
+            throw new BadRequestException('No questions could be found or generated for the selected subjects. Please select different subjects or try again.');
+        }
+
+        const formattedQuestions = exactQuestions.map((q: any) => {
+            let opts = q.options;
+            if (typeof opts === 'string') {
+                try { opts = JSON.parse(opts); } catch { opts = [opts]; }
+            }
+            if (!Array.isArray(opts)) {
+                opts = opts && typeof opts === 'object' ? Object.values(opts) : [];
+            }
+            if (opts.length === 0) {
+                opts = ['Option A', 'Option B', 'Option C', 'Option D'];
+            }
+            return {
+                text: String(q.text || 'Question'),
+                options: opts.map(String),
+                correctOption: typeof q.correctOption === 'number' ? q.correctOption : 0,
+                explanation: q.explanation ? String(q.explanation) : null
+            };
+        });
+
         const customMock = await this.prisma.mockExam.create({
             data: {
                 title: `Custom Mock Exam`,
                 description: `A custom mock exam generated on the fly for your subjects.`,
                 durationMinutes: validDuration,
-                isApproved: false,
+                isApproved: true,
                 isActive: true,
                 price: 0,
                 questions: {
-                    create: exactQuestions.map((q: any) => ({
-                        text: q.text,
-                        options: q.options,
-                        correctOption: q.correctOption,
-                        explanation: q.explanation || null
-                    }))
+                    create: formattedQuestions
                 }
             }
         });

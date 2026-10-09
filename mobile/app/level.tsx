@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, useColorScheme, Linking, TextInput, StyleSheet, Image, Platform } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Dimensions, useColorScheme, Linking, TextInput, StyleSheet, Image, Platform, Modal } from "react-native";
 import { WebView } from 'react-native-webview';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ChevronLeft, CheckCircle2, XCircle, Trophy, ArrowRight, Home, BookOpen, Heart, RefreshCcw, Flame, Timer } from "lucide-react-native";
+import { ChevronLeft, CheckCircle2, XCircle, Trophy, ArrowRight, Home, BookOpen, Heart, RefreshCcw, Flame, Timer, Sparkles } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useVideoPlayer, VideoView } from 'expo-video';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut, SlideInDown, SlideInRight, SlideOutLeft, ZoomIn, useSharedValue, useAnimatedStyle, withSpring, withSequence, withTiming, useDerivedValue, withDelay, useAnimatedProps, SharedValue } from 'react-native-reanimated';
@@ -72,6 +72,8 @@ export default function LevelScreen() {
     const [hearts, setHearts] = useState(5);
     const [showResumePrompt, setShowResumePrompt] = useState(false);
     const [savedSession, setSavedSession] = useState<any>(null);
+    const [dailyLimitReached, setDailyLimitReached] = useState(false);
+    const [dailyLimitMessage, setDailyLimitMessage] = useState('');
 
     // Animation values
     const checkScale = useSharedValue(1);
@@ -113,8 +115,21 @@ export default function LevelScreen() {
             const res = await learningApi.getLesson(id as string);
             setLesson(res.data);
             if (!res.data.content) setPhase('questions');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to fetch lesson:', error);
+            const msg = error.response?.data?.message || '';
+            const isDailyLimit = msg.toLowerCase().includes('limited to 5') || 
+                                 msg.toLowerCase().includes('5 lessons') || 
+                                 msg.toLowerCase().includes('free tier is limited') ||
+                                 msg.toLowerCase().includes('daily free lessons') ||
+                                 msg.toLowerCase().includes('upgrade to continue');
+            if (isDailyLimit) {
+                setDailyLimitReached(true);
+                setDailyLimitMessage(msg || 'Free tier is limited to 5 lessons per day. Upgrade to continue learning!');
+            } else {
+                alert(msg || 'Failed to load lesson. Please try again.');
+                router.back();
+            }
         } finally {
             setLoading(false);
         }
@@ -230,12 +245,34 @@ export default function LevelScreen() {
             } else {
                 feedback.tryAgain();
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to submit lesson:', error);
-            alert('Failed to submit lesson. Please try again.');
+            const msg = error.response?.data?.message || '';
+            const isDailyLimit = msg.toLowerCase().includes('limited to 5') || 
+                                 msg.toLowerCase().includes('5 lessons') || 
+                                 msg.toLowerCase().includes('free tier is limited') ||
+                                 msg.toLowerCase().includes('daily free lessons') ||
+                                 msg.toLowerCase().includes('upgrade to continue');
+            if (isDailyLimit) {
+                setDailyLimitReached(true);
+                setDailyLimitMessage(msg || 'Free tier is limited to 5 completed lessons per day. Upgrade to continue learning!');
+            } else {
+                alert('Failed to submit lesson. Please try again.');
+            }
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const handleRetry = () => {
+        setCurrentIndex(0);
+        setAnswers([]);
+        setSelectedOption(null);
+        setIsCorrect(null);
+        setShowNext(false);
+        setHearts(5);
+        setResult(null);
+        setPhase('questions');
     };
 
     const isYouTube = lesson?.videoUrl && /youtube\.com|youtu\.be/.test(lesson.videoUrl);
@@ -284,6 +321,85 @@ export default function LevelScreen() {
         }
     };
 
+    const renderDailyLimitModal = () => (
+        <Modal
+            visible={dailyLimitReached}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => {
+                setDailyLimitReached(false);
+                router.back();
+            }}
+        >
+            <View className="flex-1 bg-black/60 justify-end">
+                <Animated.View 
+                    entering={SlideInDown.springify().damping(18).stiffness(120)}
+                    className="bg-white dark:bg-[#1E222B] rounded-t-[36px] px-6 pt-3 pb-9 border-t border-gray-100 dark:border-gray-800 shadow-2xl items-center"
+                >
+                    {/* Pull Bar */}
+                    <View className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mb-4" />
+
+                    {/* Mascot */}
+                    <View className="mb-2 items-center">
+                        <MascotInteraction 
+                            state="crying" 
+                            size={105} 
+                            messageNode={
+                                <View className="items-center">
+                                    <Text className="text-amber-500 font-extrabold text-[13px] uppercase tracking-wider mb-0.5">
+                                        Free Tier Limit Reached
+                                    </Text>
+                                    <Text className="text-gray-900 dark:text-white font-black text-xl">
+                                        5 of 5 Lessons Today!
+                                    </Text>
+                                </View>
+                            } 
+                        />
+                    </View>
+
+                    {/* Explanatory text */}
+                    <Text className="text-gray-600 dark:text-gray-300 text-center text-[15px] leading-6 font-medium mt-2 mb-6 px-3">
+                        {dailyLimitMessage || "You've crushed all 5 free lessons for today! Upgrade to Bronze, Silver, or Gold to unlock unlimited lessons, custom CBT mock exams, and your 24/7 AI Tutor."}
+                    </Text>
+
+                    {/* Action buttons */}
+                    <View className="w-full">
+                        <TactileButton
+                            onPress={() => {
+                                setDailyLimitReached(false);
+                                router.push('/subscription');
+                            }}
+                            backgroundColor="#F59E0B"
+                            shadowColor="#D97706"
+                            className="w-full mb-3"
+                            contentClassName="w-full py-4 items-center justify-center flex-row"
+                        >
+                            <Sparkles size={20} color="#FFFFFF" />
+                            <Text className="text-white font-black text-lg uppercase tracking-wider ml-2">
+                                Upgrade Now
+                            </Text>
+                        </TactileButton>
+
+                        <TactileButton
+                            onPress={() => {
+                                setDailyLimitReached(false);
+                                router.back();
+                            }}
+                            backgroundColor={isDark ? '#272B36' : '#F3F4F6'}
+                            shadowColor={isDark ? '#1F222B' : '#E5E7EB'}
+                            className="w-full"
+                            contentClassName="w-full py-3.5 items-center justify-center"
+                        >
+                            <Text className={`font-bold text-base ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                Go Back
+                            </Text>
+                        </TactileButton>
+                    </View>
+                </Animated.View>
+            </View>
+        </Modal>
+    );
+
     if (loading) {
         return (
             <View className="flex-1 bg-white dark:bg-[#0B0D12] items-center justify-center">
@@ -293,6 +409,13 @@ export default function LevelScreen() {
     }
 
     if (!lesson) {
+        if (dailyLimitReached) {
+            return (
+                <View className="flex-1 bg-white dark:bg-[#0B0D12]">
+                    {renderDailyLimitModal()}
+                </View>
+            );
+        }
         return (
             <View className="flex-1 bg-white dark:bg-[#0B0D12] items-center justify-center p-5">
                 <Text className="text-gray-500 dark:text-gray-400 mb-4 font-medium">Lesson not found</Text>
@@ -482,6 +605,7 @@ export default function LevelScreen() {
                         </Text>
                     </TactileButton>
                 </View>
+                {renderDailyLimitModal()}
             </SafeAreaView>
         );
     }
@@ -629,7 +753,7 @@ export default function LevelScreen() {
                     {/* Footer */}
                     <Animated.View entering={FadeInUp.delay(1000)} style={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: 10 }}>
                         <TactileButton
-                            onPress={() => result?.passed ? router.back() : setPhase('questions')}
+                            onPress={() => result?.passed ? router.back() : handleRetry()}
                             backgroundColor={result?.passed ? '#58CC02' : '#1CB0F6'}
                             shadowColor={result?.passed ? '#46A302' : '#1480B0'}
                             contentClassName="w-full p-4 items-center justify-center"
@@ -828,6 +952,7 @@ export default function LevelScreen() {
                     </TactileButton>
                 </View>
             </View>
+            {renderDailyLimitModal()}
         </SafeAreaView>
     );
 }

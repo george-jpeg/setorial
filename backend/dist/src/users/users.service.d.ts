@@ -83,11 +83,9 @@ export declare class UsersService {
         avatarUrl?: string;
     }): Promise<{
         id: string;
-        name: string | null;
-        createdAt: Date;
-        updatedAt: Date;
         email: string;
         password: string;
+        name: string | null;
         isEmailVerified: boolean;
         emailOtp: string | null;
         emailOtpExpiresAt: Date | null;
@@ -106,6 +104,8 @@ export declare class UsersService {
         totalActiveDays: number;
         assessmentPassed: boolean;
         monetizationEligibleAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
         isFrozen: boolean;
         isFlagged: boolean;
         expoPushToken: string | null;

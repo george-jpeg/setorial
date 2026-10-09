@@ -16,7 +16,12 @@ const adapter_pg_1 = require("@prisma/adapter-pg");
 const pg_1 = require("pg");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     constructor() {
-        const pool = new pg_1.Pool({ connectionString: process.env.DATABASE_URL });
+        const rawUrl = process.env.DATABASE_URL || '';
+        const connectionString = rawUrl.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '');
+        const pool = new pg_1.Pool({
+            connectionString,
+            ssl: rawUrl.includes('sslmode=require') ? { rejectUnauthorized: false } : false,
+        });
         const adapter = new adapter_pg_1.PrismaPg(pool);
         super({ adapter });
     }

@@ -31,11 +31,11 @@ export class LearningController {
 
     @Roles(Role.ADMIN, Role.TUTOR, Role.STUDENT)
     @Post('ai/generate-mock')
-    async generateAiMock(@Body() dto: { subjectId: string, title: string, numQuestions?: number, durationMinutes?: number }, @Request() req: any) {
+    async generateAiMock(@Body() dto: { subjectId: string, title: string, numQuestions?: number, durationMinutes?: number, price?: number }, @Request() req: any) {
         if (req.user.role === Role.STUDENT && req.user.tier === 'FREE') {
             throw new BadRequestException('Custom AI Mocks are only available for paying users.');
         }
-        return this.aiContentService.generateMockExam(dto.subjectId, dto.title, dto.numQuestions, dto.durationMinutes, req.user.role);
+        return this.aiContentService.generateMockExam(dto.subjectId, dto.title, dto.numQuestions, dto.durationMinutes, req.user.role, dto.price);
     }
 
     @Roles(Role.ADMIN, Role.TUTOR)
@@ -91,7 +91,7 @@ export class LearningController {
 
     @Get('lessons/:id')
     async getLesson(@Param('id') id: string, @Request() req: any) {
-        return this.learningService.getLesson(id, req.user.role);
+        return this.learningService.getLesson(id, req.user?.role, req.user?.userId);
     }
 
     @Roles(Role.ADMIN, Role.TUTOR)
