@@ -21,6 +21,7 @@ import { ShiningProgressBar } from '../components/ShiningProgressBar';
 import { TactileButton } from '../components/TactileButton';
 import { SoundButton } from '../components/SoundButton';
 import { useAuthStore } from '../store/authStore';
+import { usePlacement, SuperwallPlacements } from '../services/superwall';
 
 const { width } = Dimensions.get('window');
 
@@ -74,6 +75,36 @@ export default function LevelScreen() {
     const [savedSession, setSavedSession] = useState<any>(null);
     const [dailyLimitReached, setDailyLimitReached] = useState(false);
     const [dailyLimitMessage, setDailyLimitMessage] = useState('');
+
+    const { registerPlacement } = usePlacement({
+        onDismiss: (_info, result) => {
+            if (result.type === 'purchased' || result.type === 'restored') {
+                setDailyLimitReached(false);
+            }
+        },
+        onSkip: () => {
+            setDailyLimitReached(false);
+            router.push('/subscription');
+        },
+        onError: () => {
+            setDailyLimitReached(false);
+            router.push('/subscription');
+        }
+    });
+
+    const handleUpgradePress = async () => {
+        try {
+            await registerPlacement({
+                placement: SuperwallPlacements.LESSON_LIMIT,
+                feature: () => {
+                    setDailyLimitReached(false);
+                }
+            });
+        } catch {
+            setDailyLimitReached(false);
+            router.push('/subscription');
+        }
+    };
 
     // Animation values
     const checkScale = useSharedValue(1);
@@ -365,10 +396,7 @@ export default function LevelScreen() {
                     {/* Action buttons */}
                     <View className="w-full">
                         <TactileButton
-                            onPress={() => {
-                                setDailyLimitReached(false);
-                                router.push('/subscription');
-                            }}
+                            onPress={handleUpgradePress}
                             backgroundColor="#F59E0B"
                             shadowColor="#D97706"
                             className="w-full mb-3"

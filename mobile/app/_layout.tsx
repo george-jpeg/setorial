@@ -16,6 +16,8 @@ import Animated, { FadeIn, FadeOut, SlideInDown } from "react-native-reanimated"
 import { useTranslation } from "react-i18next";
 import { Globe, X, Check } from "lucide-react-native";
 import { SoundButton } from "../components/SoundButton";
+import { purchasesService } from "../services/purchases";
+import { SuperwallWrapper } from "../components/SuperwallWrapper";
 
 // Prevent the native splash from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -30,7 +32,11 @@ export default function RootLayout() {
 
     const { setColorScheme: setTailwindScheme } = useTailwindColorScheme();
 
-    const { isLoading, token, checkSession } = useAuthStore();
+    const { user, isLoading, token, checkSession } = useAuthStore();
+
+    useEffect(() => {
+        purchasesService.init(user?.id);
+    }, [user?.id]);
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {
@@ -85,7 +91,8 @@ export default function RootLayout() {
     }, [token, isLoading, segments, showSplash]);
 
     return (
-        <View style={StyleSheet.absoluteFill}>
+        <SuperwallWrapper>
+            <View style={StyleSheet.absoluteFill}>
             {/* Stack always mounted so NavigationContainer always exists */}
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" />
@@ -189,5 +196,6 @@ export default function RootLayout() {
                 </View>
             </Modal>
         </View>
+    </SuperwallWrapper>
     );
 }
