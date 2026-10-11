@@ -8,7 +8,7 @@ import { LearningModule } from '../learning/learning.module';
 
 @Module({
     imports: [WalletModule, GamificationModule, LearningModule],
-    providers: [MockExamsService, PrismaService],
+    providers: [MockExamsService],
     controllers: [MockExamsController],
     exports: [MockExamsService],
 })

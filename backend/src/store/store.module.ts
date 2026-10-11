@@ -6,7 +6,7 @@ import { GamificationModule } from '../gamification/gamification.module';
 
 @Module({
     imports: [GamificationModule],
-    providers: [StoreService, PrismaService],
+    providers: [StoreService],
     controllers: [StoreController],
     exports: [StoreService],
 })

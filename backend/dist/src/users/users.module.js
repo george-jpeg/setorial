@@ -10,7 +10,6 @@ exports.UsersModule = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const users_controller_1 = require("./users.controller");
-const prisma_service_1 = require("../prisma.service");
 const gamification_module_1 = require("../gamification/gamification.module");
 const axios_1 = require("@nestjs/axios");
 const upload_module_1 = require("../upload/upload.module");
@@ -20,7 +19,7 @@ exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
         imports: [gamification_module_1.GamificationModule, axios_1.HttpModule, upload_module_1.UploadModule],
-        providers: [users_service_1.UsersService, prisma_service_1.PrismaService],
+        providers: [users_service_1.UsersService],
         controllers: [users_controller_1.UsersController],
         exports: [users_service_1.UsersService],
     })

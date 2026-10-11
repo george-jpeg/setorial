@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const learning_service_1 = require("./learning.service");
 const learning_controller_1 = require("./learning.controller");
 const tutor_controller_1 = require("./tutor.controller");
-const prisma_service_1 = require("../prisma.service");
 const gamification_module_1 = require("../gamification/gamification.module");
 const store_module_1 = require("../store/store.module");
 const ai_content_service_1 = require("./ai-content.service");
@@ -31,7 +30,7 @@ exports.LearningModule = LearningModule = __decorate([
                 bullmq_1.BullModule.registerQueue({ name: 'ai-content' })
             ])
         ],
-        providers: [learning_service_1.LearningService, prisma_service_1.PrismaService, ai_content_service_1.AiContentService, ai_content_processor_1.AiContentProcessor],
+        providers: [learning_service_1.LearningService, ai_content_service_1.AiContentService, ai_content_processor_1.AiContentProcessor],
         controllers: [learning_controller_1.LearningController, tutor_controller_1.TutorController],
         exports: [learning_service_1.LearningService, ai_content_service_1.AiContentService],
     })

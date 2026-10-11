@@ -10,7 +10,6 @@ exports.NotificationsModule = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const notifications_service_1 = require("./notifications.service");
-const prisma_service_1 = require("../prisma.service");
 const bullmq_1 = require("@nestjs/bullmq");
 const engagement_cron_1 = require("./engagement.cron");
 const engagement_processor_1 = require("./engagement.processor");
@@ -30,7 +29,6 @@ exports.NotificationsModule = NotificationsModule = __decorate([
         ],
         providers: [
             notifications_service_1.NotificationsService,
-            prisma_service_1.PrismaService,
             engagement_cron_1.EngagementCronService,
             engagement_processor_1.EngagementProcessor
         ],

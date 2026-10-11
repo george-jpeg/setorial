@@ -19,7 +19,7 @@ import { AiContentProcessor } from './ai-content.processor';
       BullModule.registerQueue({ name: 'ai-content' })
     ])
   ],
-  providers: [LearningService, PrismaService, AiContentService, AiContentProcessor],
+  providers: [LearningService, AiContentService, AiContentProcessor],
   controllers: [LearningController, TutorController],
   exports: [LearningService, AiContentService],
 })

@@ -4,7 +4,7 @@ import { GamificationController } from './gamification.controller';
 import { PrismaService } from '../prisma.service';
 
 @Module({
-  providers: [GamificationService, PrismaService],
+  providers: [GamificationService],
   controllers: [GamificationController],
   exports: [GamificationService]
 })

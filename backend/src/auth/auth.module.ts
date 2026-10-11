@@ -17,7 +17,7 @@ import { PrismaService } from '../prisma.service';
       signOptions: { expiresIn: (process.env.JWT_EXPIRES_IN as any) || '15m' },
     }),
   ],
-  providers: [AuthService, JwtStrategy, PrismaService],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule { }

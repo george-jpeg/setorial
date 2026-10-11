@@ -18,7 +18,6 @@ import { EngagementProcessor } from './engagement.processor';
     ],
     providers: [
         NotificationsService, 
-        PrismaService, 
         EngagementCronService, 
         EngagementProcessor
     ],

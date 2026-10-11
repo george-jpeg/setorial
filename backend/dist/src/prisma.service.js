@@ -20,6 +20,9 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
         const connectionString = rawUrl.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '');
         const pool = new pg_1.Pool({
             connectionString,
+            max: 5,
+            idleTimeoutMillis: 10000,
+            connectionTimeoutMillis: 5000,
             ssl: rawUrl.includes('sslmode=require') ? { rejectUnauthorized: false } : false,
         });
         const adapter = new adapter_pg_1.PrismaPg(pool);

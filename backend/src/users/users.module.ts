@@ -8,7 +8,7 @@ import { UploadModule } from '../upload/upload.module';
 
 @Module({
   imports: [GamificationModule, HttpModule, UploadModule],
-  providers: [UsersService, PrismaService],
+  providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService],
 })

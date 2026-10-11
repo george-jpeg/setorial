@@ -10,7 +10,6 @@ exports.MockExamsModule = void 0;
 const common_1 = require("@nestjs/common");
 const mock_exams_service_1 = require("./mock-exams.service");
 const mock_exams_controller_1 = require("./mock-exams.controller");
-const prisma_service_1 = require("../prisma.service");
 const wallet_module_1 = require("../wallet/wallet.module");
 const gamification_module_1 = require("../gamification/gamification.module");
 const learning_module_1 = require("../learning/learning.module");
@@ -20,7 +19,7 @@ exports.MockExamsModule = MockExamsModule;
 exports.MockExamsModule = MockExamsModule = __decorate([
     (0, common_1.Module)({
         imports: [wallet_module_1.WalletModule, gamification_module_1.GamificationModule, learning_module_1.LearningModule],
-        providers: [mock_exams_service_1.MockExamsService, prisma_service_1.PrismaService],
+        providers: [mock_exams_service_1.MockExamsService],
         controllers: [mock_exams_controller_1.MockExamsController],
         exports: [mock_exams_service_1.MockExamsService],
     })

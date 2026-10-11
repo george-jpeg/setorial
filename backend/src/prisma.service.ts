@@ -12,6 +12,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         const connectionString = rawUrl.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '');
         const pool = new Pool({
             connectionString,
+            max: 5,
+            idleTimeoutMillis: 10000,
+            connectionTimeoutMillis: 5000,
             ssl: rawUrl.includes('sslmode=require') ? { rejectUnauthorized: false } : false,
         });
         const adapter = new PrismaPg(pool);

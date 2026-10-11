@@ -82,11 +82,19 @@ let UsersService = UsersService_1 = class UsersService {
         const startOfWeek = this.getStartOfWeek(now);
         const startOfMonth = this.getStartOfMonth(now);
         const daysSinceJoin = Math.max(0, Math.ceil((now.getTime() - new Date(user.createdAt).getTime()) / 86400000));
-        const [pointsAgg, walletEarnedAgg, walletPayableAgg, walletPayoutAgg, lessonsCompletedAll, lessonsCompletedThisWeek, lessonsCompletedToday, totalLessonsAvailable, lastLessonProgress, freezePowerUps, mockAttempts, userBadges, timeSpentAgg, activeThisWeek, activeThisMonth, leaderboard,] = await Promise.all([
+        const [pointsAgg, walletGroups] = await Promise.all([
             this.prisma.pointsLedger.aggregate({ where: { userId }, _sum: { points: true } }),
-            this.prisma.walletLedger.aggregate({ where: { userId, type: 'EARN' }, _sum: { amount: true } }),
-            this.prisma.walletLedger.aggregate({ where: { userId, type: 'ELIGIBLE_MOVE' }, _sum: { amount: true } }),
-            this.prisma.walletLedger.aggregate({ where: { userId, type: 'PAYOUT' }, _sum: { amount: true } }),
+            this.prisma.walletLedger.groupBy({
+                by: ['type'],
+                where: { userId },
+                _sum: { amount: true },
+            }),
+        ]);
+        const totalPoints = Number(pointsAgg._sum.points ?? 0);
+        const totalEarned = Number(walletGroups.find((g) => g.type === 'EARN')?._sum.amount ?? 0);
+        const amountPayable = Number(walletGroups.find((g) => g.type === 'ELIGIBLE_MOVE')?._sum.amount ?? 0);
+        const totalPaidOut = Number(walletGroups.find((g) => g.type === 'PAYOUT')?._sum.amount ?? 0);
+        const [lessonsCompletedAll, lessonsCompletedThisWeek, lessonsCompletedToday, totalLessonsAvailable, lastLessonProgress,] = await Promise.all([
             this.prisma.userProgress.count({ where: { userId } }),
             this.prisma.userProgress.count({ where: { userId, completedAt: { gte: startOfWeek } } }),
             this.prisma.userProgress.count({ where: { userId, completedAt: { gte: startOfToday } } }),
@@ -96,6 +104,8 @@ let UsersService = UsersService_1 = class UsersService {
                 orderBy: { completedAt: 'desc' },
                 select: { completedAt: true, lesson: { select: { name: true } } },
             }),
+        ]);
+        const [freezePowerUps, mockAttempts, userBadges, timeSpentAgg, activeThisWeek, activeThisMonth,] = await Promise.all([
             this.prisma.userPowerUp.findMany({
                 where: { userId },
                 include: { powerUp: true },
@@ -113,23 +123,29 @@ let UsersService = UsersService_1 = class UsersService {
             this.prisma.userActivityLog.aggregate({ where: { userId }, _sum: { timeSpent: true } }),
             this.prisma.userActivityLog.count({ where: { userId, date: { gte: startOfWeek } } }),
             this.prisma.userActivityLog.count({ where: { userId, date: { gte: startOfMonth } } }),
-            this.prisma.pointsLedger.groupBy({
+        ]);
+        let rank = 1;
+        try {
+            const higherRankUsers = await this.prisma.pointsLedger.groupBy({
                 by: ['userId'],
                 _sum: { points: true },
-            }),
-        ]);
-        const totalPoints = Number(pointsAgg._sum.points ?? 0);
-        const totalEarned = Number(walletEarnedAgg._sum.amount ?? 0);
-        const amountPayable = Number(walletPayableAgg._sum.amount ?? 0);
-        const totalPaidOut = Number(walletPayoutAgg._sum.amount ?? 0);
+                having: {
+                    points: {
+                        _sum: {
+                            gt: totalPoints,
+                        },
+                    },
+                },
+            });
+            rank = higherRankUsers.length + 1;
+        }
+        catch {
+            rank = 1;
+        }
         const completionRate = totalLessonsAvailable > 0 ? Number(((lessonsCompletedAll / totalLessonsAvailable) * 100).toFixed(2)) : 0;
         const freezeCount = freezePowerUps.length;
         const usedFreezeCount = freezePowerUps.filter((item) => !item.isActive).length;
         const remainingFreezeCount = freezePowerUps.filter((item) => item.isActive).length;
-        const rank = leaderboard
-            .map((item) => ({ userId: item.userId, points: Number(item._sum.points ?? 0) }))
-            .sort((a, b) => b.points - a.points)
-            .findIndex((item) => item.userId === userId) + 1 || 0;
         const monetizationEligible = ['SILVER', 'GOLD'].includes(user.tier)
             && user.isVerified
             && user.assessmentPassed
