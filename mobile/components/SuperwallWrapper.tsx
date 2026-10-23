@@ -8,8 +8,8 @@ import { useAuthStore } from '../store/authStore';
 import { purchasesService } from '../services/purchases';
 
 export const SUPERWALL_API_KEYS = {
-  ios: process.env.EXPO_PUBLIC_SUPERWALL_IOS_KEY || '',
-  android: process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_KEY || '',
+  ios: process.env.EXPO_PUBLIC_SUPERWALL_IOS_KEY || 'pk_xmESSGPGsfNgmpK4-xkfD',
+  android: process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_KEY || 'pk_o9tob5NocFGi1ktexmyGx',
 };
 
 // Check if running in Expo Go or Web where custom native modules are not loaded

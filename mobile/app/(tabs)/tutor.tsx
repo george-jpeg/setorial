@@ -2,7 +2,7 @@ import { SoundButton } from '../../components/SoundButton';
 import { TactileButton } from '../../components/TactileButton';
 import { MascotInteraction } from '../../components/MascotInteraction';
 import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, TouchableOpacity, useColorScheme } from 'react-native';
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Send, Sparkles, StopCircle, RefreshCw, Bot } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useState, useRef, useEffect } from 'react';
@@ -21,6 +21,7 @@ type ChatMessage = {
 };
 
 export default function TabTutorScreen() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const { user, token } = useAuthStore();
     const [message, setMessage] = useState('');
@@ -173,6 +174,16 @@ export default function TabTutorScreen() {
         }
     };
 
+    const handleNewChat = () => {
+        if (loading) {
+            handleStop();
+        }
+        setSessionId(null);
+        setChat([
+            { id: 'greeting', role: 'assistant', text: `Hello ${user?.name || 'Scholar'}! I'm your Personal AI Tutor. How can I help your studies today?`, done: true }
+        ]);
+    };
+
     useEffect(() => {
         setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
     }, [chat.length, initialFetch]);
@@ -214,12 +225,11 @@ export default function TabTutorScreen() {
                                 <Text className="text-amber-500 font-black text-[10px] tracking-wider uppercase">GOLD</Text>
                             </View>
                         </View>
-                        <Text className="text-gray-400 text-xs font-semibold">1-on-1 Personal Academic Mentor</Text>
                     </View>
                 </View>
 
                 <TouchableOpacity 
-                    onPress={() => { setChat([]); setSessionId(null); loadLatestSession(); }} 
+                    onPress={handleNewChat} 
                     className="w-10 h-10 items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full"
                 >
                     <RefreshCw size={18} color="#AFAFAF" />
@@ -282,8 +292,11 @@ export default function TabTutorScreen() {
                     )}
                 </ScrollView>
 
-                {/* Input Area with bottom clearance for tab bar */}
-                <View className="px-5 pt-3 pb-24 border-t-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-[#0B0D12]">
+                {/* Input Area */}
+                <View 
+                    className="px-5 pt-3 border-t-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-[#0B0D12]"
+                    style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+                >
                     <View className="flex-row items-center bg-gray-50 dark:bg-[#1E222B] rounded-2xl border-2 border-b-4 border-gray-100 dark:border-[#272B36] px-4 py-2">
                         <TextInput
                             className="flex-1 text-black dark:text-white font-bold text-[16px] py-2"

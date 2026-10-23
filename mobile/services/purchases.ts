@@ -4,8 +4,8 @@ import { Platform } from 'react-native';
 import { useAuthStore } from '../store/authStore';
 
 export const REVENUECAT_API_KEYS = {
-  ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '',
-  android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '',
+  ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || 'appl_1vFuSIKkhAQTTOWdLBgvVmJKTQ',
+  android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || 'test_ipPDlMpjQhUtJyElPmXURiilqJv',
 };
 
 export const getRevenueCatApiKey = () => {
@@ -27,6 +27,11 @@ export const purchasesService = {
       return;
     }
 
+    const apiKey = getRevenueCatApiKey();
+    if (!apiKey) {
+      return;
+    }
+
     try {
       if (__DEV__) {
         Purchases.setLogLevel(LOG_LEVEL.DEBUG);
@@ -35,7 +40,7 @@ export const purchasesService = {
       }
 
       await Purchases.configure({
-        apiKey: getRevenueCatApiKey(),
+        apiKey,
         appUserID: userId || null,
       });
 
