@@ -30,7 +30,7 @@ export default function TutorScreen() {
     const [chat, setChat] = useState<ChatMessage[]>([]);
     const [loading, setLoading] = useState(false);
     const [initialFetch, setInitialFetch] = useState(true);
-    const scrollViewRef = useRef<ScrollView>(null);
+    const scrollViewRef = useRef<any>(null);
     const esRef = useRef<EventSource | null>(null);
 
     const isGold = user?.tier === 'GOLD';
