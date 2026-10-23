@@ -13,7 +13,8 @@
       "buildNumber": "1",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Setorial needs access to your microphone for interactive audio questions and voice responses.",
-        "NSPhotoLibraryUsageDescription": "Setorial needs access to your photos to allow you to upload and change your profile picture."
+        "NSPhotoLibraryUsageDescription": "Setorial needs access to your photos to allow you to upload and change your profile picture.",
+        "NSCameraUsageDescription": "Setorial needs access to your camera to take a photo for your profile picture."
       }
     },
     "android": {
