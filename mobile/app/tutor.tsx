@@ -175,6 +175,16 @@ export default function TutorScreen() {
         }
     };
 
+    const handleNewChat = () => {
+        if (loading) {
+            handleStop();
+        }
+        setSessionId(null);
+        setChat([
+            { id: 'greeting', role: 'assistant', text: `Hello ${user?.name || 'Scholar'}! I'm your Personal Tutor. How can I help you today?`, done: true }
+        ]);
+    };
+
     useEffect(() => {
         setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
     }, [chat.length, initialFetch]);
@@ -213,14 +223,19 @@ export default function TutorScreen() {
     return (
         <SafeAreaView className="flex-1 bg-white dark:bg-[#0B0D12]">
             {/* Header */}
-            <View className="flex-row items-center justify-between px-5 py-6 border-b-2 border-gray-100 dark:border-gray-800">
-                <SoundButton onPress={() => router.back()} className="w-10 h-10 items-center justify-center">
-                    <ChevronLeft size={24} color="#AFAFAF" />
-                </SoundButton>
-                <View className="flex-row items-center">
-                </View>
-                <TouchableOpacity onPress={() => { setChat([]); setSessionId(null); }} className="w-10 h-10 items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full">
-                    <RefreshCw size={18} color="#AFAFAF" />
+            <View className="flex-row items-center justify-between px-5 py-3 border-b-2 border-gray-100 dark:border-gray-800">
+                <TouchableOpacity 
+                    onPress={() => router.back()} 
+                    className="w-10 h-10 items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full"
+                >
+                    <ChevronLeft size={22} color={isDark ? '#F3F4F6' : '#1F2937'} />
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                    onPress={handleNewChat} 
+                    className="w-10 h-10 items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full"
+                >
+                    <RefreshCw size={18} color={isDark ? '#9CA3AF' : '#64748B'} />
                 </TouchableOpacity>
             </View>
 
@@ -238,60 +253,54 @@ export default function TutorScreen() {
                         <ActivityIndicator size="large" color="#EAB308" className="mt-20" />
                     ) : (
                         chat.map((msg, i) => (
-                            <Animated.View 
-                                key={msg.id} 
-                                entering={msg.role === 'user' ? SlideInRight : FadeIn}
-                                className={`mb-6 flex-row ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                            >
-                                {(msg.role === 'assistant' || msg.role === 'tutor') && (
-                                    <View className="mr-3 mt-1">
-                                        <View className="w-12 h-12 items-center justify-center mt-[-8px]">
-                                            <LottieView
-                                                source={require('../assets/animations/Happy-mood.json')}
-                                                autoPlay
-                                                loop
-                                                style={{ width: 56, height: 56 }}
-                                            />
-                                        </View>
-                                    </View>
-                                )}
-                                <View 
-                                    className={`max-w-[85%] p-4 rounded-2xl border-2 border-b-4 ${
-                                        msg.role === 'user' 
-                                        ? 'bg-[#1CB0F6] border-[#1899D6] rounded-tr-none' 
-                                        : 'w-full bg-white dark:bg-[#1E222B] border-gray-100 dark:border-[#272B36] rounded-tl-none'
-                                    }`}
+                            msg.role === 'user' ? (
+                                <Animated.View 
+                                    key={msg.id} 
+                                    entering={SlideInRight}
+                                    className="mb-4 flex-row justify-end"
                                 >
-                                    {msg.role === 'user' ? (
-                                        <Text className="font-bold text-[16px] text-white">
+                                    <View className="bg-[#1CB0F6] rounded-3xl rounded-tr-md px-4 py-3 max-w-[82%] shadow-sm">
+                                        <Text style={{ color: '#FFFFFF' }} className="text-[15px] leading-[22px] font-semibold">
                                             {msg.text}
                                         </Text>
-                                    ) : (
-                                        msg.text ? (
-                                            msg.done ? (
-                                                <MathText
-                                                    content={msg.text}
-                                                    color={isDark ? '#FFFFFF' : '#333333'}
-                                                    fontSize={16}
-                                                />
-                                            ) : (
-                                                <Markdown
-                                                    style={{
-                                                        body: { color: isDark ? '#FFFFFF' : '#333333', fontSize: 16 },
-                                                        code_inline: { backgroundColor: '#f0f0f0', color: '#e83e8c', borderRadius: 4, padding: 2 },
-                                                        code_block: { backgroundColor: '#1E1E1E', color: '#D4D4D4', padding: 10, borderRadius: 8 },
-                                                        fence: { backgroundColor: '#1E1E1E', color: '#D4D4D4', padding: 10, borderRadius: 8 }
-                                                    }}
-                                                >
-                                                    {msg.text}
-                                                </Markdown>
-                                            )
+                                    </View>
+                                </Animated.View>
+                            ) : (
+                                <Animated.View 
+                                    key={msg.id} 
+                                    entering={FadeIn}
+                                    className="mb-6 flex-row items-start justify-start w-full"
+                                >
+                                    <View className="mr-2.5 mt-0.5 w-9 h-9 items-center justify-center">
+                                        <LottieView
+                                            source={require('../assets/animations/Happy-mood.json')}
+                                            autoPlay
+                                            loop
+                                            style={{ width: 36, height: 36 }}
+                                        />
+                                    </View>
+                                    <View 
+                                        style={{
+                                            backgroundColor: isDark ? '#1E222B' : '#FFFFFF',
+                                            borderColor: isDark ? '#272B36' : '#E5E5E5',
+                                        }}
+                                        className="flex-1 rounded-3xl rounded-tl-md p-4 border shadow-sm"
+                                    >
+                                        {msg.text ? (
+                                            <MathText 
+                                                content={msg.text} 
+                                                color={isDark ? '#F3F4F6' : '#1F2937'} 
+                                                fontSize={15} 
+                                            />
                                         ) : (
-                                            <ActivityIndicator size="small" color="#EAB308" />
-                                        )
-                                    )}
-                                </View>
-                            </Animated.View>
+                                            <View className="flex-row items-center py-1">
+                                                <ActivityIndicator size="small" color="#EAB308" />
+                                                <Text className="ml-2 text-xs font-bold text-gray-400">Thinking...</Text>
+                                            </View>
+                                        )}
+                                    </View>
+                                </Animated.View>
+                            )
                         ))
                     )}
                     <View className="h-4" />

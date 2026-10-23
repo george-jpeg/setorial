@@ -4,7 +4,7 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { LinearTransition } from 'react-native-reanimated';
-import { Home, Search, Wallet, MoreHorizontal, ShoppingBag } from 'lucide-react-native';
+import { Home, Search, Wallet, MoreHorizontal, ShoppingBag, Bot } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/authStore';
 import { playSound } from '../../lib/audio';
@@ -34,6 +34,14 @@ const TAB_CONFIG: TabConfig[] = [
     Icon: Search,
     gradient: ['#38BDF8', '#0284C7'],
     shadowColor: '#38BDF8',
+  },
+  {
+    name: 'tutor',
+    labelKey: 'tabs.tutor',
+    fallback: 'AI Tutor',
+    Icon: Bot,
+    gradient: ['#F59E0B', '#D97706'],
+    shadowColor: '#F59E0B',
   },
   {
     name: 'statistics',
@@ -85,10 +93,12 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
     return null;
   }
 
+  const isGold = user?.tier === 'GOLD';
   const showWallet = ['SILVER', 'GOLD'].includes(user?.tier || '');
 
   // Filter and order tabs according to TAB_CONFIG
   const visibleTabs = TAB_CONFIG.map((cfg) => {
+    if (cfg.name === 'tutor' && !isGold) return null;
     if (cfg.name === 'statistics' && !showWallet) return null;
     const routeIndex = state.routes.findIndex((r: any) => r.name === cfg.name);
     if (routeIndex === -1) return null;
@@ -261,6 +271,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 
 export default function TabLayout() {
   const { user } = useAuthStore();
+  const isGold = user?.tier === 'GOLD';
   const showWallet = ['SILVER', 'GOLD'].includes(user?.tier || '');
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -279,7 +290,7 @@ export default function TabLayout() {
         name="tutor"
         options={{
           title: 'AI Tutor',
-          href: null,
+          href: isGold ? undefined : null,
           tabBarStyle: { display: 'none' },
         }}
       />
