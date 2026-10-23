@@ -3,7 +3,14 @@ import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { Platform } from 'react-native';
 import { useAuthStore } from '../store/authStore';
 
-export const REVENUECAT_API_KEY = 'test_ipPDlMpjQhUtJyElPmXURiilqJv';
+export const REVENUECAT_API_KEYS = {
+  ios: 'appl_1vFuSIKkhAQTTOWdLBgvVmJKTQ',
+  android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || 'test_ipPDlMpjQhUtJyElPmXURiilqJv',
+};
+
+export const getRevenueCatApiKey = () => {
+  return Platform.OS === 'ios' ? REVENUECAT_API_KEYS.ios : REVENUECAT_API_KEYS.android;
+};
 
 let isConfigured = false;
 
@@ -28,7 +35,7 @@ export const purchasesService = {
       }
 
       await Purchases.configure({
-        apiKey: REVENUECAT_API_KEY,
+        apiKey: getRevenueCatApiKey(),
         appUserID: userId || null,
       });
 
