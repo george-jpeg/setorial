@@ -160,18 +160,24 @@ function LeaderboardScreen() {
                                         style={{ width: '100%', marginBottom: 12 }}
                                         contentClassName="p-4 flex-row items-center justify-between"
                                     >
-                                        <View className="flex-row items-center">
-                                            <Text className={`${isCurrentUser ? 'text-amber-500' : 'text-[#AFAFAF]'} font-black w-6 text-lg`}>{actualRank}</Text>
-                                            <View className={`w-12 h-12 rounded-full bg-[#F5F5F5] mr-4 overflow-hidden border-2 ${isCurrentUser ? 'border-amber-400' : 'border-[#E5E5E5]'}`}>
+                                        <View className="flex-row items-center flex-1 mr-3">
+                                            <Text className={`${isCurrentUser ? 'text-amber-500' : 'text-[#AFAFAF]'} font-black w-6 text-base`}>{actualRank}</Text>
+                                            <View className={`w-10 h-10 rounded-full bg-[#F5F5F5] mr-3 overflow-hidden border-2 ${isCurrentUser ? 'border-amber-400' : 'border-[#E5E5E5]'}`}>
                                                 <Image source={{ uri: item.avatarUrl || `https://i.pravatar.cc/100?u=${item.id}` }} className="w-full h-full rounded-full" />
                                             </View>
-                                            <View>
-                                                <Text className={`${isCurrentUser ? 'text-amber-700' : 'text-[#4B4B4B]'} font-bold text-[17px] uppercase tracking-wider`}>{isCurrentUser ? 'You' : (item.name || 'Student')}</Text>
-                                                <Text className={`${isCurrentUser ? 'text-amber-500' : 'text-[#AFAFAF]'} text-xs font-bold uppercase`}>Rank #{actualRank}</Text>
+                                            <View className="flex-1 justify-center">
+                                                <Text 
+                                                    className={`${isCurrentUser ? 'text-amber-700 dark:text-amber-400' : 'text-gray-900 dark:text-white'} font-bold text-sm`}
+                                                    numberOfLines={1}
+                                                    ellipsizeMode="tail"
+                                                >
+                                                    {isCurrentUser ? 'You' : (item.name || 'Student')}
+                                                </Text>
+                                                <Text className={`${isCurrentUser ? 'text-amber-500' : 'text-[#AFAFAF] dark:text-gray-400'} text-[11px] font-bold`}>Rank #{actualRank}</Text>
                                             </View>
                                         </View>
-                                        <View className={`${isCurrentUser ? 'bg-amber-400 border-amber-500' : 'bg-[#FFC800] border-[#E5B400]'} px-4 py-2 rounded-xl border-b-4`}>
-                                            <Text className={`${isCurrentUser ? 'text-white' : 'text-yellow-900'} font-extrabold uppercase tracking-widest`}>{item.points} pts</Text>
+                                        <View className={`${isCurrentUser ? 'bg-amber-400 border-amber-500' : 'bg-[#FFC800] border-[#E5B400]'} px-3 py-1.5 rounded-xl border-b-4 flex-shrink-0`}>
+                                            <Text className={`${isCurrentUser ? 'text-white' : 'text-yellow-950'} font-extrabold text-xs uppercase tracking-wider`}>{item.points} pts</Text>
                                         </View>
                                     </TactileButton>
                                 </Animated.View>
@@ -191,18 +197,24 @@ function LeaderboardScreen() {
                                     style={{ width: '100%' }}
                                     contentClassName="p-4 flex-row items-center justify-between"
                                 >
-                                    <View className="flex-row items-center">
-                                        <Text className="text-amber-500 font-black w-10 text-lg text-center">{userRank}</Text>
-                                        <View className="w-12 h-12 rounded-full bg-[#F5F5F5] mr-4 overflow-hidden border-2 border-amber-400">
+                                    <View className="flex-row items-center flex-1 mr-3">
+                                        <Text className="text-amber-500 font-black w-8 text-base text-center">{userRank}</Text>
+                                        <View className="w-10 h-10 rounded-full bg-[#F5F5F5] mr-3 overflow-hidden border-2 border-amber-400">
                                             <Image source={{ uri: currentUserData.avatarUrl || `https://i.pravatar.cc/100?u=${currentUserData.id}` }} className="w-full h-full rounded-full" />
                                         </View>
-                                        <View>
-                                            <Text className="text-amber-700 font-bold text-[17px] uppercase tracking-wider">You</Text>
-                                            <Text className="text-amber-500 text-xs font-bold uppercase">Rank #{userRank}</Text>
+                                        <View className="flex-1 justify-center">
+                                            <Text 
+                                                className="text-amber-700 dark:text-amber-400 font-bold text-sm"
+                                                numberOfLines={1}
+                                                ellipsizeMode="tail"
+                                            >
+                                                You
+                                            </Text>
+                                            <Text className="text-amber-500 text-[11px] font-bold">Rank #{userRank}</Text>
                                         </View>
                                     </View>
-                                    <View className="bg-amber-400 px-4 py-2 rounded-xl border-b-4 border-amber-500">
-                                        <Text className="text-white font-extrabold uppercase tracking-widest">{currentUserData.points} pts</Text>
+                                    <View className="bg-amber-400 px-3 py-1.5 rounded-xl border-b-4 border-amber-500 flex-shrink-0">
+                                        <Text className="text-white font-extrabold text-xs uppercase tracking-wider">{currentUserData.points} pts</Text>
                                     </View>
                                 </TactileButton>
                             </Animated.View>
@@ -232,7 +244,7 @@ function PodiumItem({ user, rank, height, color, icon, isCurrentUser }: any) {
             >
                 <Text className="text-black dark:text-white/60 font-black uppercase tracking-widest text-sm mb-1">#{rank}</Text>
                 <Text className="text-black dark:text-white font-extrabold text-2xl">{user.points}</Text>
-                <Text className={`${isCurrentUser ? 'text-amber-500 font-black' : 'text-black dark:text-white/50 font-bold'} text-[11px] mt-2 uppercase tracking-wide`}>{isCurrentUser ? 'You' : (user.name?.split(' ')[0] || 'User')}</Text>
+                <Text numberOfLines={1} ellipsizeMode="tail" className={`${isCurrentUser ? 'text-amber-500 font-black' : 'text-black dark:text-white/70 font-bold'} text-[11px] mt-2 uppercase tracking-wide px-1`}>{isCurrentUser ? 'You' : (user.name?.split(' ')[0] || 'User')}</Text>
             </View>
         </Animated.View>
     );
