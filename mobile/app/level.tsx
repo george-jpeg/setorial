@@ -77,8 +77,8 @@ export default function LevelScreen() {
     const [dailyLimitMessage, setDailyLimitMessage] = useState('');
 
     const { registerPlacement } = usePlacement({
-        onDismiss: (_info, result) => {
-            if (result.type === 'purchased' || result.type === 'restored') {
+        onDismiss: (_info: any, result: any) => {
+            if (result?.type === 'purchased' || result?.type === 'restored') {
                 setDailyLimitReached(false);
             }
         },
