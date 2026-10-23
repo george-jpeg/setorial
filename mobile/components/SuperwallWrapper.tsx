@@ -13,8 +13,8 @@ import { useAuthStore } from '../store/authStore';
 import { purchasesService } from '../services/purchases';
 
 export const SUPERWALL_API_KEYS = {
-  ios: 'pk_xmESSGPGsfNgmpK4-xkfD',
-  android: 'pk_o9tob5NocFGi1ktexmyGx',
+  ios: process.env.EXPO_PUBLIC_SUPERWALL_IOS_KEY || '',
+  android: process.env.EXPO_PUBLIC_SUPERWALL_ANDROID_KEY || '',
 };
 
 /**

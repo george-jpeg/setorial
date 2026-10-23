@@ -4,8 +4,8 @@ import { Platform } from 'react-native';
 import { useAuthStore } from '../store/authStore';
 
 export const REVENUECAT_API_KEYS = {
-  ios: 'appl_1vFuSIKkhAQTTOWdLBgvVmJKTQ',
-  android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || 'test_ipPDlMpjQhUtJyElPmXURiilqJv',
+  ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || '',
+  android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '',
 };
 
 export const getRevenueCatApiKey = () => {
