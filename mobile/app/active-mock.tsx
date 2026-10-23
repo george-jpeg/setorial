@@ -287,41 +287,42 @@ export default function ActiveMockScreen() {
             </ScrollView>
 
             {/* Bottom CBT Navigation Controls */}
-            <View className="px-5 py-4 border-t-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-[#0B0D12] flex-row items-center justify-between">
-                <TouchableOpacity
+            <View className="px-5 py-3 border-t-2 border-gray-100 dark:border-gray-800 bg-white dark:bg-[#0B0D12] flex-row items-center justify-between">
+                <SoundButton
                     disabled={currentQIndex === 0}
                     onPress={() => setCurrentQIndex(prev => Math.max(0, prev - 1))}
-                    className={`flex-row items-center py-3 px-4 rounded-xl border ${currentQIndex === 0 ? 'opacity-30 border-gray-200' : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700'}`}
+                    className={`flex-row items-center justify-center px-4 py-2.5 rounded-xl border-2 border-b-4 ${
+                        currentQIndex === 0 
+                            ? 'opacity-30 bg-gray-100 border-gray-200 dark:bg-zinc-800 dark:border-zinc-700' 
+                            : 'bg-gray-100 dark:bg-[#1E222B] border-gray-200 dark:border-[#272B36]'
+                    }`}
+                    style={{ minWidth: 92 }}
                 >
-                    <ChevronLeft size={18} color={isDark ? '#FFF' : '#374151'} />
-                    <Text className="font-bold text-sm ml-1 text-gray-700 dark:text-gray-200">Prev</Text>
-                </TouchableOpacity>
+                    <ChevronLeft size={16} color={isDark ? '#FFF' : '#374151'} />
+                    <Text className="font-bold text-xs uppercase tracking-wider ml-1 text-gray-700 dark:text-gray-200">Prev</Text>
+                </SoundButton>
 
                 {currentQIndex < totalQuestions - 1 ? (
-                    <TactileButton
+                    <SoundButton
                         onPress={() => setCurrentQIndex(prev => Math.min(totalQuestions - 1, prev + 1))}
-                        backgroundColor="#1CB0F6"
-                        shadowColor="#0284C7"
-                        contentClassName="py-3 px-6 flex-row items-center justify-center"
-                        className="rounded-xl"
+                        className="bg-[#1CB0F6] border-2 border-[#1899D6] border-b-4 rounded-xl px-5 py-2.5 flex-row items-center justify-center"
+                        style={{ minWidth: 96 }}
                     >
-                        <Text className="text-white font-bold text-sm uppercase tracking-wider mr-1">Next</Text>
-                        <ChevronRight size={18} color="#FFF" />
-                    </TactileButton>
+                        <Text className="text-white font-bold text-xs uppercase tracking-wider mr-1">Next</Text>
+                        <ChevronRight size={16} color="#FFF" />
+                    </SoundButton>
                 ) : (
-                    <TactileButton
+                    <SoundButton
                         onPress={confirmSubmit}
                         disabled={isSubmitting}
-                        backgroundColor="#F59E0B"
-                        shadowColor="#D97706"
-                        contentClassName="py-3 px-6 flex-row items-center justify-center"
-                        className="rounded-xl"
+                        className="bg-[#F59E0B] border-2 border-[#D97706] border-b-4 rounded-xl px-5 py-2.5 flex-row items-center justify-center"
+                        style={{ minWidth: 120 }}
                     >
-                        <CheckCircle2 size={18} color="#FFF" style={{ marginRight: 6 }} />
-                        <Text className="text-white font-black text-sm uppercase tracking-wider">
+                        <CheckCircle2 size={16} color="#FFF" style={{ marginRight: 5 }} />
+                        <Text className="text-white font-black text-xs uppercase tracking-wider">
                             {isSubmitting ? 'Submitting...' : 'Finish Exam'}
                         </Text>
-                    </TactileButton>
+                    </SoundButton>
                 )}
             </View>
         </SafeAreaView>
