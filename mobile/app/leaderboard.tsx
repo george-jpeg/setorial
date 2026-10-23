@@ -1,7 +1,7 @@
 import { SoundButton } from '../components/SoundButton';
 import { TactileButton } from '../components/TactileButton';
 import Animated, { SlideInLeft, SlideInUp } from 'react-native-reanimated';
-import { View, Text, ScrollView, ActivityIndicator, Image } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, Image, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ChevronLeft, Crown, Medal } from "lucide-react-native";
 import { useRouter } from "expo-router";
@@ -11,6 +11,8 @@ import { useAuthStore } from '../store/authStore';
 
 function LeaderboardScreen() {
     const router = useRouter();
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
     const { user } = useAuthStore();
     const [leaderboard, setLeaderboard] = useState<any[]>([]);
     const [subjects, setSubjects] = useState<any[]>([]);
@@ -82,24 +84,24 @@ function LeaderboardScreen() {
                         <View className="mr-3">
                             <TactileButton
                                 onPress={() => handleSubjectSelect(null)}
-                                backgroundColor={!selectedSubject ? '#1CB0F6' : '#FFFFFF'}
-                                shadowColor={!selectedSubject ? '#1899D6' : '#E5E5E5'}
+                                backgroundColor={!selectedSubject ? '#1CB0F6' : (isDark ? '#1E222B' : '#FFFFFF')}
+                                shadowColor={!selectedSubject ? '#1899D6' : (isDark ? '#272B36' : '#E5E5E5')}
                                 depth={4}
                                 contentClassName="px-6 py-3"
                             >
-                                <Text className={`font-bold uppercase tracking-widest text-xs ${!selectedSubject ? 'text-white' : 'text-[#AFAFAF] dark:text-gray-400'}`}>Global</Text>
+                                <Text className={`font-bold uppercase tracking-widest text-xs ${!selectedSubject ? 'text-white' : (isDark ? 'text-gray-400' : 'text-[#AFAFAF]')}`}>Global</Text>
                             </TactileButton>
                         </View>
                         {subjects.map((subject) => (
                             <View key={subject.id} className="mr-3">
                                 <TactileButton
                                     onPress={() => handleSubjectSelect(subject.id)}
-                                    backgroundColor={selectedSubject === subject.id ? '#1CB0F6' : '#FFFFFF'}
-                                    shadowColor={selectedSubject === subject.id ? '#1899D6' : '#E5E5E5'}
+                                    backgroundColor={selectedSubject === subject.id ? '#1CB0F6' : (isDark ? '#1E222B' : '#FFFFFF')}
+                                    shadowColor={selectedSubject === subject.id ? '#1899D6' : (isDark ? '#272B36' : '#E5E5E5')}
                                     depth={4}
                                     contentClassName="px-6 py-3"
                                 >
-                                    <Text className={`font-bold uppercase tracking-widest text-xs ${selectedSubject === subject.id ? 'text-white' : 'text-[#AFAFAF] dark:text-gray-400'}`}>{subject.name}</Text>
+                                    <Text className={`font-bold uppercase tracking-widest text-xs ${selectedSubject === subject.id ? 'text-white' : (isDark ? 'text-gray-400' : 'text-[#AFAFAF]')}`}>{subject.name}</Text>
                                 </TactileButton>
                             </View>
                         ))}
@@ -115,7 +117,7 @@ function LeaderboardScreen() {
                                 user={topThree[1]}
                                 rank={2}
                                 height={140}
-                                color="bg-gray-100 dark:bg-zinc-800"
+                                color={isDark ? "bg-zinc-800" : "bg-gray-100"}
                                 icon={<Medal size={20} color="#94A3B8" />}
                                 isCurrentUser={topThree[1].id === user?.id}
                             />
@@ -126,7 +128,7 @@ function LeaderboardScreen() {
                                 user={topThree[0]}
                                 rank={1}
                                 height={180}
-                                color="bg-yellow-100"
+                                color={isDark ? "bg-yellow-950/40" : "bg-yellow-100"}
                                 icon={<Crown size={24} color="#EAB308" />}
                                 isCurrentUser={topThree[0].id === user?.id}
                             />
@@ -137,7 +139,7 @@ function LeaderboardScreen() {
                                 user={topThree[2]}
                                 rank={3}
                                 height={120}
-                                color="bg-orange-50"
+                                color={isDark ? "bg-orange-950/40" : "bg-orange-50"}
                                 icon={<Medal size={20} color="#92400E" />}
                                 isCurrentUser={topThree[2].id === user?.id}
                             />
@@ -145,7 +147,7 @@ function LeaderboardScreen() {
                     </View>
 
                     {/* Others List 4-15 */}
-                    <View className="bg-white dark:bg-[#0B0D12] p-6 mb-4 min-h-[400px]">
+                    <View className="p-6 mb-4 min-h-[400px]">
                         <Text className="text-[#AFAFAF] dark:text-gray-500 font-bold mb-6 text-sm uppercase tracking-widest text-center">Top Performers</Text>
                         {others.map((item, index) => {
                             const actualRank = index + 4;
@@ -154,26 +156,26 @@ function LeaderboardScreen() {
                             return (
                                 <Animated.View key={item.id} entering={SlideInLeft.delay(index * 100).springify()} style={{ opacity: isLastItem ? 0.4 : 1 }}>
                                     <TactileButton
-                                        backgroundColor={isCurrentUser ? "#FEF3C7" : "#FFFFFF"}
-                                        shadowColor={isCurrentUser ? "#FDE68A" : "#E5E5E5"}
+                                        backgroundColor={isCurrentUser ? (isDark ? '#362B0D' : '#FEF3C7') : (isDark ? '#1E222B' : '#FFFFFF')}
+                                        shadowColor={isCurrentUser ? (isDark ? '#241D09' : '#FDE68A') : (isDark ? '#272B36' : '#E5E5E5')}
                                         depth={4}
                                         style={{ width: '100%', marginBottom: 12 }}
                                         contentClassName="p-4 flex-row items-center justify-between"
                                     >
                                         <View className="flex-row items-center flex-1 mr-3">
-                                            <Text className={`${isCurrentUser ? 'text-amber-500' : 'text-[#AFAFAF]'} font-black w-6 text-base`}>{actualRank}</Text>
-                                            <View className={`w-10 h-10 rounded-full bg-[#F5F5F5] mr-3 overflow-hidden border-2 ${isCurrentUser ? 'border-amber-400' : 'border-[#E5E5E5]'}`}>
+                                            <Text className={`${isCurrentUser ? 'text-amber-500' : (isDark ? 'text-gray-400' : 'text-[#AFAFAF]')} font-black w-6 text-base`}>{actualRank}</Text>
+                                            <View className={`w-10 h-10 rounded-full ${isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-[#F5F5F5] border-[#E5E5E5]'} mr-3 overflow-hidden border-2 ${isCurrentUser ? 'border-amber-400' : ''}`}>
                                                 <Image source={{ uri: item.avatarUrl || `https://i.pravatar.cc/100?u=${item.id}` }} className="w-full h-full rounded-full" />
                                             </View>
                                             <View className="flex-1 justify-center">
                                                 <Text 
-                                                    className={`${isCurrentUser ? 'text-amber-700 dark:text-amber-400' : 'text-gray-900 dark:text-white'} font-bold text-sm`}
+                                                    className={`${isCurrentUser ? (isDark ? 'text-amber-400' : 'text-amber-700') : (isDark ? 'text-gray-100' : 'text-gray-900')} font-bold text-sm`}
                                                     numberOfLines={1}
                                                     ellipsizeMode="tail"
                                                 >
                                                     {isCurrentUser ? 'You' : (item.name || 'Student')}
                                                 </Text>
-                                                <Text className={`${isCurrentUser ? 'text-amber-500' : 'text-[#AFAFAF] dark:text-gray-400'} text-[11px] font-bold`}>Rank #{actualRank}</Text>
+                                                <Text className={`${isCurrentUser ? 'text-amber-500' : (isDark ? 'text-gray-400' : 'text-gray-500')} text-[11px] font-bold`}>Rank #{actualRank}</Text>
                                             </View>
                                         </View>
                                         <View className={`${isCurrentUser ? 'bg-amber-400 border-amber-500' : 'bg-[#FFC800] border-[#E5B400]'} px-3 py-1.5 rounded-xl border-b-4 flex-shrink-0`}>
@@ -191,20 +193,20 @@ function LeaderboardScreen() {
                             <Text className="text-center text-gray-400 font-bold mb-4 uppercase tracking-widest text-xs">Your Rank</Text>
                             <Animated.View entering={SlideInUp.springify()}>
                                 <TactileButton
-                                    backgroundColor="#FEF3C7"
-                                    shadowColor="#FDE68A"
+                                    backgroundColor={isDark ? '#362B0D' : '#FEF3C7'}
+                                    shadowColor={isDark ? '#241D09' : '#FDE68A'}
                                     depth={4}
                                     style={{ width: '100%' }}
                                     contentClassName="p-4 flex-row items-center justify-between"
                                 >
                                     <View className="flex-row items-center flex-1 mr-3">
                                         <Text className="text-amber-500 font-black w-8 text-base text-center">{userRank}</Text>
-                                        <View className="w-10 h-10 rounded-full bg-[#F5F5F5] mr-3 overflow-hidden border-2 border-amber-400">
+                                        <View className={`w-10 h-10 rounded-full ${isDark ? 'bg-zinc-800' : 'bg-[#F5F5F5]'} mr-3 overflow-hidden border-2 border-amber-400`}>
                                             <Image source={{ uri: currentUserData.avatarUrl || `https://i.pravatar.cc/100?u=${currentUserData.id}` }} className="w-full h-full rounded-full" />
                                         </View>
                                         <View className="flex-1 justify-center">
                                             <Text 
-                                                className="text-amber-700 dark:text-amber-400 font-bold text-sm"
+                                                className={`${isDark ? 'text-amber-400' : 'text-amber-700'} font-bold text-sm`}
                                                 numberOfLines={1}
                                                 ellipsizeMode="tail"
                                             >
