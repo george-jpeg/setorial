@@ -41,6 +41,13 @@ export class AuthController {
         return this.authService.googleLogin(body.idToken, ipCountry);
     }
 
+    @HttpCode(HttpStatus.OK)
+    @Post('apple')
+    async appleLogin(@Body() body: { identityToken: string; user?: string; fullName?: any }, @Request() req: any) {
+        const ipCountry = req.headers['cf-ipcountry'] || req.headers['x-vercel-ip-country'] || null;
+        return this.authService.appleLogin(body, ipCountry);
+    }
+
     @UseGuards(JwtAuthGuard)
     @Patch('password')
     async changePassword(

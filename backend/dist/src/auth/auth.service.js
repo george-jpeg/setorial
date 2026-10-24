@@ -249,6 +249,64 @@ let AuthService = AuthService_1 = class AuthService {
         }
         return this.generateAuthResponse(user);
     }
+    async appleLogin(body, ipCountry) {
+        const { identityToken, fullName } = body;
+        if (!identityToken)
+            throw new common_1.BadRequestException('Missing Apple identity token');
+        let payload;
+        try {
+            payload = this.jwtService.decode(identityToken);
+        }
+        catch (err) {
+            this.logger.warn(`Failed to decode Apple token: ${err.message}`);
+            throw new common_1.UnauthorizedException('Invalid Apple token');
+        }
+        if (!payload || payload.iss !== 'https://appleid.apple.com') {
+            this.logger.warn(`Invalid Apple token issuer: ${payload?.iss}`);
+            throw new common_1.UnauthorizedException('Invalid Apple token issuer');
+        }
+        const appleUserId = payload.sub;
+        if (!appleUserId) {
+            throw new common_1.UnauthorizedException('Invalid Apple user identifier');
+        }
+        const email = payload.email
+            ? payload.email.toLowerCase()
+            : `${appleUserId}@apple.privaterelay`;
+        let user = await this.prisma.user.findFirst({
+            where: { email: { equals: email, mode: 'insensitive' } }
+        });
+        let isNew = false;
+        let formattedName = 'Student';
+        if (fullName) {
+            const parts = [fullName.givenName, fullName.familyName].filter(Boolean);
+            if (parts.length > 0)
+                formattedName = parts.join(' ');
+        }
+        if (!user) {
+            const randomPassword = await bcrypt.hash((0, crypto_1.randomBytes)(32).toString('hex'), 10);
+            user = await this.usersService.createUser({
+                email,
+                password: randomPassword,
+                name: formattedName,
+                isEmailVerified: true,
+            });
+            isNew = true;
+        }
+        else if (!user.isEmailVerified) {
+            user = await this.prisma.user.update({
+                where: { id: user.id },
+                data: { isEmailVerified: true, emailOtp: null, emailOtpExpiresAt: null },
+            });
+        }
+        if (ipCountry && user.countryLocked && user.billingCountry && user.billingCountry.toUpperCase() !== ipCountry.toUpperCase() && !user.isFlagged) {
+            user = await this.prisma.user.update({ where: { id: user.id }, data: { isFlagged: true } });
+        }
+        await this.prisma.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } });
+        if (isNew) {
+            this.notificationsService.sendWelcomeEmail(user.email, user.name || 'Student').catch(err => this.logger.warn(`Failed to queue welcome email in appleLogin: ${err.message}`));
+        }
+        return this.generateAuthResponse(user);
+    }
     generateAuthResponse(user) {
         const payload = { sub: user.id, email: user.email, role: user.role, tier: user.tier };
         const { password, ...userWithoutPassword } = user;

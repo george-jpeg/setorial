@@ -34,6 +34,7 @@ api.interceptors.response.use(
 export const authApi = {
     login: (data: any) => api.post('/auth/login', data),
     googleLogin: (idToken: string) => api.post('/auth/google', { idToken }),
+    appleLogin: (data: { identityToken: string; user?: string; fullName?: any }) => api.post('/auth/apple', data),
     register: (data: any) => api.post('/auth/register', data),
     verifyOtp: (data: { email: string; otp: string }) => api.post('/auth/verify-otp', data),
     getMe: () => api.get('/users/me'),

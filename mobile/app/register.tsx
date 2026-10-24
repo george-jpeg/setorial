@@ -1,6 +1,7 @@
 import { SoundButton } from '../components/SoundButton';
 import { TactileButton } from '../components/TactileButton';
 import { GoogleSignInButton } from '../components/GoogleSignInButton';
+import { AppleSignInButton } from '../components/AppleSignInButton';
 import { View, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, Eye, EyeOff, Check, ChevronDown } from "lucide-react-native";
@@ -178,6 +179,7 @@ export default function RegisterScreen() {
                         <View className="flex-1 h-[1px] bg-[#E5E5E5] dark:bg-[#272B36]" />
                     </View>
 
+                    {Platform.OS === 'ios' && <AppleSignInButton onError={setError} />}
                     <GoogleSignInButton onError={setError} />
                 </Animated.View>
             </KeyboardAvoidingView>

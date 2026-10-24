@@ -38,5 +38,14 @@ export declare class AuthService {
         token: string;
         refresh_token: string;
     }>;
+    appleLogin(body: {
+        identityToken: string;
+        user?: string;
+        fullName?: any;
+    }, ipCountry?: string): Promise<{
+        user: any;
+        token: string;
+        refresh_token: string;
+    }>;
     private generateAuthResponse;
 }

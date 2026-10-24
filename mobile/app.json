@@ -11,6 +11,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.scholarsedge.setorial",
       "buildNumber": "1",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Setorial needs access to your microphone for interactive audio questions and voice responses.",
         "NSPhotoLibraryUsageDescription": "Setorial needs access to your photos to allow you to upload and change your profile picture.",
@@ -58,6 +59,7 @@
       "expo-web-browser",
       "expo-status-bar",
       "expo-audio",
+      "expo-apple-authentication",
       "@react-native-google-signin/google-signin",
       [
         "expo-build-properties",
