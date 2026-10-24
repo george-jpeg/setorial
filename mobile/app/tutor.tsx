@@ -198,7 +198,7 @@ export default function TutorScreen() {
                 />
                 <View className="mt-8 mb-4 w-full px-4">
                     <TactileButton 
-                        onPress={() => router.push('/subscription')}
+                        onPress={() => router.push({ pathname: '/subscription', params: { placement: 'AiTutor' } })}
                         backgroundColor="#EAB308"
                         shadowColor="#CA8A04"
                         depth={6}

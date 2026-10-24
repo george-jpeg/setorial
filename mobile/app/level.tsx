@@ -76,34 +76,12 @@ export default function LevelScreen() {
     const [dailyLimitReached, setDailyLimitReached] = useState(false);
     const [dailyLimitMessage, setDailyLimitMessage] = useState('');
 
-    const { registerPlacement } = usePlacement({
-        onDismiss: (_info: any, result: any) => {
-            if (result?.type === 'purchased' || result?.type === 'restored') {
-                setDailyLimitReached(false);
-            }
-        },
-        onSkip: () => {
-            setDailyLimitReached(false);
-            router.push('/subscription');
-        },
-        onError: () => {
-            setDailyLimitReached(false);
-            router.push('/subscription');
-        }
-    });
-
-    const handleUpgradePress = async () => {
-        try {
-            await registerPlacement({
-                placement: SuperwallPlacements.LESSON_LIMIT,
-                feature: () => {
-                    setDailyLimitReached(false);
-                }
-            });
-        } catch {
-            setDailyLimitReached(false);
-            router.push('/subscription');
-        }
+    const handleUpgradePress = () => {
+        setDailyLimitReached(false);
+        router.push({
+            pathname: '/subscription',
+            params: { placement: SuperwallPlacements.LESSON_LIMIT },
+        });
     };
 
     // Animation values
